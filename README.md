@@ -80,10 +80,7 @@ three-things-daily/
 ---
 
 ## 📸 截图
-
-> 深色主题，渐变背景，任务卡片带光效
-
-*(等待你的第一次截图！)*
+<img width="2148" height="1440" alt="image" src="https://github.com/user-attachments/assets/0abe9e32-6dd3-4357-a139-9b28c9202e2d" />
 
 ---
 
