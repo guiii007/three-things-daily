@@ -585,6 +585,10 @@
 
   const pad = (n) => String(n).padStart(2, '0');
   const timeStr = (ts) => ts ? `${pad(new Date(ts).getHours())}:${pad(new Date(ts).getMinutes())}` : '';
+  const dateTimeStr = (ts) => {
+    const d = new Date(ts);
+    return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
   const dateStr = (ts) => {
     const d = new Date(ts);
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -938,8 +942,8 @@
 
       const meta = document.createElement('div');
       meta.className = 'ts mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1.5';
-      meta.innerHTML = `<span>创建 ${timeStr(t.createdAt)}</span>` +
-        (t.completedAt ? `<span class="text-[var(--accent-soft)]">完成 ${timeStr(t.completedAt)}</span>` : '');
+      meta.innerHTML = `<span>创建 ${dateTimeStr(t.createdAt)}</span>` +
+        (t.completedAt ? `<span class="text-[var(--accent-soft)]">完成 ${dateTimeStr(t.completedAt)}</span>` : '');
 
       mid.appendChild(textRow);
       mid.appendChild(meta);
