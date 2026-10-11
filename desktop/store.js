@@ -22,15 +22,21 @@ class Store {
   constructor(file, recordsDir) {
     this.file = file;
     this.recordsDir = recordsDir;
-    this.data = { version: 1, tasks: [], rewardCount: 0 };
+    this.data = { version: 1, tasks: [], rewardCount: 0, petSize: 100 };
     if (fs.existsSync(file)) {
       const data = JSON.parse(fs.readFileSync(file, 'utf8'));
       if (data.version !== 1 || !Array.isArray(data.tasks) || !Number.isInteger(data.rewardCount) || data.rewardCount < 0 || data.tasks.some(t => !t || !/^[0-9a-f-]{36}$/.test(t.id) || !/^\d{4}-\d{2}-\d{2}$/.test(t.day) || ![0,1,2].includes(t.slot) || typeof t.text !== 'string' || !t.text.trim() || t.text.length > 120 || typeof t.note !== 'string' || t.note.length > 20000 || typeof t.done !== 'boolean' || !Number.isFinite(t.createdAt) || (t.done && !Number.isFinite(t.completedAt)) || (t.position !== null && (!t.position || !Number.isFinite(t.position.x) || !Number.isFinite(t.position.y))))) throw new Error('数据文件格式不正确，请保留文件以便恢复。');
       // 兼容旧版附图字段，保留原数据，但不再提供图片操作。
+      if (data.petSize === undefined) data.petSize = 100;
+      if (!Number.isInteger(data.petSize) || data.petSize < 20 || data.petSize > 200) throw new Error('伙伴大小设置无效，请保留数据文件以便恢复。');
       this.data = data;
     }
   }
   snapshot() { return structuredClone(this.data); }
+  setPetSize(percent) {
+    if (!Number.isInteger(percent) || percent < 20 || percent > 200) throw new Error('伙伴大小需在 20% 到 200% 之间。');
+    const next = this.snapshot(); next.petSize = percent; this.commit(next);
+  }
   commit(next) {
     fs.mkdirSync(path.dirname(this.file), { recursive: true });
     const tmp = this.file + '.tmp';
@@ -80,7 +86,7 @@ class Store {
   writeRecord(task) {
     if (!task.done || !task.completedAt) throw new Error('任务尚未完成。');
     const { filename, text } = record(task);
-    const dir = path.join(this.recordsDir, dayKey(task.completedAt));
+    const dir = this.recordsDir;
     fs.mkdirSync(dir, { recursive: true });
     const file = path.join(dir, filename);
     fs.writeFileSync(file + '.tmp', text, 'utf8'); fs.renameSync(file + '.tmp', file); return file;

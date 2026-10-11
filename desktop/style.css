@@ -35,14 +35,14 @@ body.editor #complete { position:fixed; bottom:18px; left:22px; width:calc(100% 
 #message { margin:0; padding:0 22px 18px; color:#a13d5d; overflow-wrap:anywhere; font-size:12px; }
 body.pet,body.reward { background:transparent; overflow:hidden; }
 body.pet #message,body.reward #message { display:none; }
-#pet { display:block; width:120px; height:72px; padding:0; border:0; background:transparent; box-shadow:none; user-select:none; touch-action:none; }
-#pet canvas { display:block; width:120px; height:72px; image-rendering:pixelated; pointer-events:none; }
+#pet { display:block; width:var(--pet-width,120px); height:var(--pet-height,72px); padding:0; border:0; background:transparent; box-shadow:none; user-select:none; touch-action:none; }
+#pet .pet-art { display:block; width:100%; height:100%; pointer-events:none; }
 #pet { cursor:pointer; }
 #pet.picked { cursor:grabbing; }
-#pet.picked canvas { transform-origin:50% 55%; animation:pickup .18s steps(4) forwards; }
-#pet.landing canvas { transform-origin:50% 55%; animation:putdown .22s steps(5) forwards; }
-@keyframes pickup { 0%{transform:scale(1)} 40%{transform:scale(1.08,.85)} 100%{transform:translateY(-5px) scale(.88,1.06) rotate(-3deg)} }
-@keyframes putdown { 0%{transform:translateY(-5px) scale(.88,1.06) rotate(-3deg)} 65%{transform:scale(1.08,.9)} 100%{transform:none} }
+#pet.picked .pet-art { transform-origin:50% 55%; animation:pickup .18s steps(4) forwards; }
+#pet.landing .pet-art { transform-origin:50% 55%; animation:putdown .22s steps(5) forwards; }
+@keyframes pickup { 0%{transform:scale(1)} 40%{transform:scale(1.08,.85)} 100%{transform:translateY(var(--lift,-5px)) scale(.88,1.06) rotate(-3deg)} }
+@keyframes putdown { 0%{transform:translateY(var(--lift,-5px)) scale(.88,1.06) rotate(-3deg)} 65%{transform:scale(1.08,.9)} 100%{transform:none} }
 #pet.departing { animation:depart .6s steps(8) forwards; pointer-events:none; }
 @keyframes depart { 0% { opacity:1; transform:scale(1); } 40% { transform:translateY(-4px) scale(1.1); } 100% { opacity:0; transform:translateY(12px) scale(.2); } }
 #reward { padding:18px; text-align:center; opacity:0; animation:reward-in .35s ease forwards; }
@@ -51,3 +51,11 @@ body.pet #message,body.reward #message { display:none; }
 #reward-copy span:nth-child(7n+1){color:#bc496c} #reward-copy span:nth-child(7n+2){color:#b26a28} #reward-copy span:nth-child(7n+3){color:#8b7921} #reward-copy span:nth-child(7n+4){color:#418754} #reward-copy span:nth-child(7n+5){color:#308b91} #reward-copy span:nth-child(7n+6){color:#6275b3} #reward-copy span:nth-child(7n+7){color:#9b60ab}
 #reward.fading { animation:reward-out 1.8s ease forwards; }
 @keyframes reward-in { to { opacity:1; } } @keyframes reward-out { from {opacity:1} to {opacity:0} }
+
+.size-control { flex:1 1 290px; min-width:0; }
+.size-control label { font:12px/1.5 'Microsoft YaHei',sans-serif; }
+#pet-size-number { margin:0 4px 0 8px; width:62px; padding:2px 4px; color:#a13d5d; font-size:12px; font-variant-numeric:tabular-nums; }
+#pet-size-number:invalid { border-color:#ce5d79; }
+.size-slider { display:flex; align-items:center; gap:8px; font-size:11px; }
+#pet-size { min-width:60px; width:100%; flex:1; accent-color:#ce5d79; cursor:pointer; }
+#reset-size { padding:4px 6px; white-space:nowrap; }

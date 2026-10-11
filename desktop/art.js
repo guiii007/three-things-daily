@@ -28,3 +28,16 @@ const palettes=[{main:'#ee7d87',shade:'#ce5d79',shine:'#ffc2b7'},{main:'#eec669'
     dot(6,18,'#eca59c',5,2);dot(25,18,'#eca59c',5,2);
     [[11,23],[12,24],[13,25],[14,26],[15,26],[16,27],[17,27],[18,27],[19,27],[20,26],[21,26],[22,25],[23,24],[24,23]].forEach(([x,y])=>dot(x,y,ink));
   }
+
+function drawCapsuleSVG(svg, index) {
+  const source=document.createElement('canvas');source.width=40;source.height=24;drawCapsule(source,index);
+  const pixels=source.getContext('2d').getImageData(0,0,40,24).data;
+  const fragment=document.createDocumentFragment();
+  for(let y=0;y<24;y++)for(let x=0;x<40;x++){
+    const offset=(y*40+x)*4;if(!pixels[offset+3])continue;
+    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    for(const [name,value] of Object.entries({x,y,width:1,height:1,fill:'rgb('+pixels[offset]+','+pixels[offset+1]+','+pixels[offset+2]+')'}))rect.setAttribute(name,value);
+    fragment.append(rect);
+  }
+  svg.replaceChildren(fragment);return pixels;
+}

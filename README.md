@@ -1,6 +1,6 @@
 # 三件事 · 每日核心任务
 
-新增 **Windows 像素伙伴桌面试用版**：角色悬浮陪伴、轻点写心得、长按捏起拖动、完成自动生成纯文字 TXT。[下载 Windows 0.1.3](https://github.com/guiii007/three-things-daily/releases/download/v0.1.3/ThreeThings-0.1.3-Windows.exe)，双击即可运行。[桌面版说明](desktop/README.md)
+新增 **Windows 像素伙伴桌面试用版**：角色悬浮陪伴、轻点写心得、长按捏起拖动、完成自动生成桌面纯文字 TXT，伙伴大小可用滑块或数字框调节（20%～200%）。[下载 Windows 0.1.6](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe)，双击即可运行。[桌面版说明](desktop/README.md)
 
 > 聚焦每日三件核心事项，深色主题单文件 HTML 网页应用。
 

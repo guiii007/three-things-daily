@@ -39,12 +39,38 @@ async function invoke(page,method,value) {
     const props=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).map(w=>({bounds:w.getBounds(),top:w.isAlwaysOnTop(),visible:w.isVisible(),focusable:w.isFocusable()})));
     console.log('Native pet properties:',JSON.stringify(props));
     assert.equal(props.length,1);assert.equal(props[0].bounds.width,120);assert.equal(props[0].bounds.height,72);assert.ok(props[0].top);assert.equal(props[0].focusable,false);
+    const sizeNumber=manager.locator('#pet-size-number');
+    await sizeNumber.fill('');await sizeNumber.pressSequentially('137');
+    assert.equal(await sizeNumber.inputValue(),'137');
+    await manager.waitForFunction(async()=>(await window.companion.call('state')).value.petSize===137);
+    for(const percent of [48,132,20,200]){
+      await sizeNumber.fill(String(percent));
+      await manager.waitForFunction(async value=>(await window.companion.call('state')).value.petSize===value,percent);
+      await pet.waitForFunction(value=>document.querySelector('#pet').clientWidth===Math.round(120*value/100),percent);
+      assert.equal(await manager.locator('#pet-size').inputValue(),String(percent));
+    }
+    for(const invalid of ['', '19', '201', '120.5']){
+      await sizeNumber.fill(invalid);assert.equal((await invoke(manager,'state')).petSize,200);
+      await manager.locator('#count').click();assert.equal(await sizeNumber.inputValue(),'200');
+    }
+    for(const percent of [20,137,200]) {
+      await manager.locator('#pet-size').evaluate((input,value)=>{input.value=String(value);input.dispatchEvent(new Event('input',{bubbles:true}));},percent);
+      await manager.waitForFunction(async value=>(await window.companion.call('state')).value.petSize===value,percent);
+      await pet.waitForFunction(value=>document.querySelector('#pet').clientWidth===Math.round(120*value/100),percent);
+      const bounds=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('view=pet')).getBounds());
+      assert.equal(bounds.width,Math.max(64,Math.round(120*percent/100)));assert.equal(bounds.height,Math.max(64,Math.round(72*percent/100)));
+      assert.ok(await pet.locator('svg rect').count()>100);assert.equal(await sizeNumber.inputValue(),String(percent));
+      if(percent===20){await pet.locator('#pet').click({position:{x:14,y:7}});const tinyEditor=await pageFor('editor',task.id);await invoke(tinyEditor,'close');}
+      if(percent===200)await pet.screenshot({path:path.join(root,'pet-200.png')});
+    }
+    await manager.locator('#reset-size').click();await pet.waitForFunction(()=>document.querySelector('#pet').clientWidth===120);
+    assert.equal(await sizeNumber.inputValue(),'100');
     await pet.locator('#pet').click({position:{x:60,y:30}});const editor=await pageFor('editor',task.id);
     assert.equal(await editor.locator('input[type=file], #image-preview').count(),0);
     await editor.locator('#note').fill('第一行心得\n最后一笔立即完成也要记录');
     await editor.evaluate(()=>document.fonts.ready);await editor.screenshot({path:path.join(root,'editor.png')});
     await editor.locator('#complete').click();await manager.waitForFunction(()=>document.querySelector('.task-info small').textContent.includes('已完成'));
-    snapshot=await invoke(manager,'state');task=snapshot.tasks[0];assert.equal(task.done,true);assert.match(fs.readFileSync(task.recordPath,'utf8'),/最后一笔立即完成也要记录/);
+    snapshot=await invoke(manager,'state');task=snapshot.tasks[0];assert.equal(task.done,true);assert.equal(path.dirname(task.recordPath),snapshot.recordsDir);assert.match(fs.readFileSync(task.recordPath,'utf8'),/最后一笔立即完成也要记录/);
     const reward=await pageFor('reward');await reward.waitForSelector('#reward-copy span');
     assert.ok(await reward.locator('#reward-copy span').count()>5);
     await reward.evaluate(()=>document.fonts.ready);await reward.screenshot({path:path.join(root,'reward.png')});
@@ -59,8 +85,10 @@ async function invoke(page,method,value) {
     snapshot=await invoke(manager,'state');
     await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('view=manager')).close());const hidden=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('view=manager')).isVisible());assert.equal(hidden,false);
     assert.ok((await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).every(w=>w.isVisible()))));
+    await invoke(manager,'petSize',137);
     await application.close();application=null;
-    manager=await launch();snapshot=await invoke(manager,'state');assert.equal(snapshot.tasks.length,3);assert.equal(snapshot.tasks[0].note,'第一行心得\n最后一笔立即完成也要记录');
+    manager=await launch();snapshot=await invoke(manager,'state');assert.equal(snapshot.petSize,137);assert.equal(await manager.locator('#pet-size-number').inputValue(),'137');assert.equal(snapshot.tasks.length,3);assert.equal(snapshot.tasks[0].note,'第一行心得\n最后一笔立即完成也要记录');
+    for(const task of snapshot.tasks){const resized=await pageFor('pet',task.id);await resized.waitForFunction(()=>window.petReady);assert.equal(await resized.locator('#pet').evaluate(p=>p.clientWidth),164);}
     const windows=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length);assert.equal(windows,3);
     await manager.screenshot({path:path.join(root,'manager.png')});
     assert.deepEqual(errors,[]);console.log('Desktop smoke OK: creation, transparent pets, editor, latest notes, native TXT, reward/fade, daily limit, reopen, tray persistence, restart.');console.log('Test artifacts: '+root);

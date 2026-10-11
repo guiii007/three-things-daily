@@ -3,6 +3,7 @@ const path = require('node:path');
 const { Store, dayKey } = require('./store');
 const { leftDown } = require('./native-mouse');
 const { HoldGesture } = require('./hold-gesture');
+const { petWindowDimensions, scaledShape } = require('./pet-geometry');
 const testRoot = process.env.CAPSULE_TEST_ROOT;
 const nativeUITest = Boolean(testRoot && process.env.CAPSULE_NATIVE_UI_TEST === '1');
 if (testRoot) app.setPath('userData', path.join(testRoot, 'data'));
@@ -32,11 +33,29 @@ function clamp(bounds) {
 }
 function petPosition(task) {
   const area = screen.getPrimaryDisplay().workArea;
-  return clamp({ ...(task.position || { x: area.x + area.width - 160 - task.slot * 150, y: area.y + area.height - 115 }), width: 120, height: 72 });
+  const dimensions = petWindowDimensions(store.data.petSize);
+  return clamp({ ...(task.position || { x: area.x + area.width - dimensions.width - 40 - task.slot * (dimensions.width + 30), y: area.y + area.height - dimensions.height - 43 }), ...dimensions });
+}
+function applyPetShape(id, win) {
+  if (!nativeUITest && petShapes.has(id)) win.setShape(scaledShape(petShapes.get(id), store.data.petSize));
+}
+function resizePets(percent) {
+  for (const id of [...gestures.keys()]) finishGesture(id, true);
+  store.setPetSize(percent);
+  const dimensions = petWindowDimensions(percent);
+  for (const [id, win] of pets) {
+    if (win.isDestroyed() || closingPets.has(id)) continue;
+    const old = win.getBounds(), position = clamp({ x: old.x, y: old.y, ...dimensions });
+    if (!nativeUITest) { win.setShape([]); win.setBounds({ ...position, ...dimensions }); }
+    else win.setPosition(position.x, position.y);
+    applyPetShape(id, win);
+    if (position.x !== old.x || position.y !== old.y) store.move(id, position);
+  }
+  broadcast();
 }
 function addPet(task) {
   if (pets.has(task.id) || task.done || closingPets.has(task.id)) return;
-  const win = createWindow({ ...petPosition(task), width: nativeUITest ? 320 : 120, height: nativeUITest ? 240 : 72, frame: nativeUITest, transparent: !nativeUITest, backgroundColor: nativeUITest ? '#fffaf0' : '#00000000', resizable: false, movable: false, focusable: nativeUITest, skipTaskbar: !nativeUITest, hasShadow: false, alwaysOnTop: true }, { view: 'pet', id: task.id });
+  const win = createWindow({ ...petPosition(task), width: nativeUITest ? 320 : petWindowDimensions(store.data.petSize).width, height: nativeUITest ? 240 : petWindowDimensions(store.data.petSize).height, frame: nativeUITest, transparent: !nativeUITest, backgroundColor: nativeUITest ? '#fffaf0' : '#00000000', resizable: false, movable: false, focusable: nativeUITest, skipTaskbar: !nativeUITest, hasShadow: false, alwaysOnTop: true }, { view: 'pet', id: task.id });
   // 隔离的原生输入测试让自动化工具能枚举小窗口，正式角色仍无焦点、无任务栏条目。
   if(nativeUITest){win.on('page-title-updated',event=>event.preventDefault());win.setTitle('长按测试角色');}
   pets.set(task.id, win); win.setAlwaysOnTop(true, 'floating');
@@ -56,9 +75,9 @@ function finishGesture(id, cancelled=false) {
   if(gesture.picked) {
     try{store.move(id,win.getBounds());broadcast();}catch(error){dialog.showErrorBox('位置暂时未能保存',error.message);}
     win.webContents.send('companion:gesture',{phase:'released'});
-    setTimeout(()=>{if(!nativeUITest&&!win.isDestroyed()&&!gestures.has(id))win.setShape(petShapes.get(id)||[]);},240);
+    setTimeout(()=>{if(!nativeUITest&&!win.isDestroyed()&&!gestures.has(id))applyPetShape(id, win);},240);
   }else{
-    if(!nativeUITest)win.setShape(petShapes.get(id)||[]);
+    if(!nativeUITest)applyPetShape(id, win);
     win.webContents.send('companion:gesture',{phase:'idle'});
     if(!cancelled&&!gesture.moved)showEditor(id);
   }
@@ -76,9 +95,9 @@ function sampleGesture(id) {
 function showEditor(id) {
   const task = store.task(id);
   if (editors.has(id)) { const win = editors.get(id); win.show(); win.focus(); return; }
-  const pet = pets.get(id), origin = pet ? pet.getBounds() : { ...petPosition(task), width: 120, height: 72 };
+  const pet = pets.get(id), origin = pet ? pet.getBounds() : { ...petPosition(task), ...petWindowDimensions(store.data.petSize) };
   const area = screen.getDisplayMatching(origin).workArea;
-  let x = origin.x + 136;
+  let x = origin.x + origin.width + 16;
   if (x + 430 > area.x + area.width) x = origin.x - 446;
   const pos = clamp({ x, y: origin.y - 360, width: 430, height: 530 });
   const win = createWindow({ ...pos, width: 430, height: 530, minWidth: 400, minHeight: 430, alwaysOnTop: true, title: '任务与心得' }, { view: 'editor', id });
@@ -135,9 +154,10 @@ ipcMain.handle('companion:call', async (event, method, value) => {
       case 'export': requireTask(); result = store.export(id); broadcast(); break;
       case 'records': result = await openRecords(); if (result) throw new Error(result); break;
       case 'quit': requireManager(); app.quit(); break;
+      case 'petSize': requireManager(); resizePets(value); result = store.data.petSize; break;
       case 'shape': {
-        if (context.view !== 'pet' || !Array.isArray(value) || value.length > 200 || value.some(r => ![r.x,r.y,r.width,r.height].every(Number.isInteger) || r.x < 0 || r.y < 0 || r.width < 1 || r.height < 1 || r.x+r.width > 120 || r.y+r.height > 72)) throw new Error('角色区域无效。');
-        petShapes.set(context.id,value);if(!nativeUITest)context.win.setShape(value); context.win.setAlwaysOnTop(false); context.win.setAlwaysOnTop(true, 'screen-saver'); break;
+        if (context.view !== 'pet' || !Array.isArray(value) || value.length > 200 || value.some(r => ![r.x,r.y,r.width,r.height].every(Number.isInteger) || r.x < 0 || r.y < 0 || r.width < 1 || r.height < 1 || r.x+r.width > 40 || r.y+r.height > 24)) throw new Error('角色区域无效。');
+        petShapes.set(context.id,value);applyPetShape(context.id,context.win); context.win.setAlwaysOnTop(false); context.win.setAlwaysOnTop(true, 'screen-saver'); break;
       }
       case 'pressStart': {
         if (context.view !== 'pet') throw new Error('操作无效。');
@@ -163,7 +183,7 @@ else {
   app.on('second-instance', () => { if (store) showManager(); });
   app.whenReady().then(() => {
     try {
-      const recordsDir = testRoot ? path.join(testRoot, 'records') : path.join(app.getPath('documents'), '三件事', '完成记录');
+      const recordsDir = testRoot ? path.join(testRoot, 'records') : app.getPath('desktop');
       store = new Store(path.join(app.getPath('userData'), 'tasks.json'), recordsDir);
       // 原生托盘使用随应用打包的 PNG，避免 SVG 解码差异。
       tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'tray.png')));

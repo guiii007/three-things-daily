@@ -62,6 +62,14 @@ test('数据损坏时不覆盖原文件',t=>{
 });
 test('安全文件名和日期以本地日历计算',t=>{
   const {store}=setup(t),now=new Date(2026,9,11,23,59).getTime();const task=store.create('../危险:*?"<>|文件',now);
-  const done=store.complete(task.id,{note:'记录'},now+1000);assert.equal(dayKey(now),'2026-10-11');assert.equal(path.dirname(done.task.recordPath),path.join(store.recordsDir,'2026-10-11'));
+  const done=store.complete(task.id,{note:'记录'},now+1000);assert.equal(dayKey(now),'2026-10-11');assert.equal(path.dirname(done.task.recordPath),store.recordsDir);
   assert.ok(!/[<>:"/\\|?*]/.test(path.basename(done.task.recordPath)));
+});
+
+test('伙伴大小保存、范围校验以及旧版默认 100%',t=>{
+  const {store,dir}=setup(t);store.create('保持任务');assert.equal(store.data.petSize,100);
+  for(const percent of [20,137,200]){store.setPetSize(percent);assert.equal(new Store(store.file,store.recordsDir).data.petSize,percent);}
+  for(const value of [19,201,100.5,'100',NaN])assert.throws(()=>store.setPetSize(value),/20%/);
+  const legacy=store.snapshot();delete legacy.petSize;fs.writeFileSync(store.file,JSON.stringify(legacy));
+  const restored=new Store(store.file,store.recordsDir);assert.equal(restored.data.petSize,100);assert.equal(restored.data.tasks.length,1);
 });

@@ -35,8 +35,34 @@ function taskRow(task) {
   if(task.done) { const txt=document.createElement('button'); txt.textContent='补存 TXT'; txt.addEventListener('click',safely(async()=>{$('#message').textContent='已保存：'+await call('export',{id:task.id});})); actions.append(txt); }
   row.append(canvas,info,actions); return row;
 }
+let sizePending = null, sizeUpdating = false;
+function renderPetSize() {
+  const width=Math.round(120*state.petSize/100),height=Math.round(72*state.petSize/100);
+  document.documentElement.style.setProperty('--pet-width',width+'px');
+  document.documentElement.style.setProperty('--pet-height',height+'px');
+  document.documentElement.style.setProperty('--lift',(-5*state.petSize/100)+'px');
+}
+function syncSizeControls(percent=state.petSize, force=false) {
+  $('#pet-size').value=percent;
+  const number=$('#pet-size-number');
+  if(force||document.activeElement!==number){number.value=percent;number.setCustomValidity('');}
+}
+function validSizeNumber() {
+  const input=$('#pet-size-number'), value=Number(input.value);
+  const valid=/^\d+$/.test(input.value)&&Number.isInteger(value)&&value>=20&&value<=200;
+  input.setCustomValidity(valid?'':'请输入 20～200 之间的整数');
+  return valid?value:null;
+}
+async function changePetSize(percent) {
+  syncSizeControls(percent);sizePending=percent;
+  if(sizeUpdating)return;
+  sizeUpdating=true;
+  try { while(sizePending!==null) { const requested=sizePending;sizePending=null;state.petSize=await call('petSize',requested); } }
+  finally { sizeUpdating=false;syncSizeControls(); }
+}
 function renderManager() {
   const today=state.tasks.filter(t=>t.day===state.today), past=state.tasks.filter(t=>t.day!==state.today).slice().reverse();
+  if(!sizeUpdating)syncSizeControls();
   $('#count').textContent=`${state.today} · 已创建 ${today.length} / 3 · 完成 ${today.filter(t=>t.done).length}`;
   $('#create').disabled=today.length>=3; $('#new-task').disabled=today.length>=3;
   $('#today-list').replaceChildren(...today.map(taskRow));
@@ -46,9 +72,9 @@ function renderManager() {
   $('#folder').textContent=`完成后 TXT 自动保存到：${state.recordsDir}`;
 }
 async function initPet() {
-  const task=state.tasks.find(t=>t.id===id), pet=$('#pet'), canvas=pet.querySelector('canvas'); drawCapsule(canvas,task.slot);
-  const pixels=canvas.getContext('2d').getImageData(0,0,40,24).data, rects=[];
-  for(let y=0;y<24;y++){let x=0;while(x<40){while(x<40&&!pixels[(y*40+x)*4+3])x++;const l=x;while(x<40&&pixels[(y*40+x)*4+3])x++;if(l<x)rects.push({x:l*3,y:y*3,width:(x-l)*3,height:3});}}
+  const task=state.tasks.find(t=>t.id===id), pet=$('#pet');renderPetSize();
+  const pixels=drawCapsuleSVG(pet.querySelector('svg'),task.slot), rects=[];
+  for(let y=0;y<24;y++){let x=0;while(x<40){while(x<40&&!pixels[(y*40+x)*4+3])x++;const l=x;while(x<40&&pixels[(y*40+x)*4+3])x++;if(l<x)rects.push({x:l,y,width:x-l,height:1});}}
   await call('shape',rects); window.petReady=true;
   let landingTimer;
   pet.title='轻点写心得，按住半秒捏起拖动';
@@ -67,9 +93,15 @@ async function initPet() {
 }
 async function init() {
   document.body.className=view; $(`#${view}`).hidden=false; state=await call('state');
-  window.companion.onState(next=>{state=next;if(view==='manager')renderManager();if(view==='editor')renderEditor();});
+  window.companion.onState(next=>{state=next;if(view==='manager')renderManager();if(view==='editor')renderEditor();if(view==='pet')renderPetSize();});
   if(view==='manager') {
-    renderManager();$('#create-form').addEventListener('submit',safely(async event=>{event.preventDefault();await call('create',{text:$('#new-task').value});$('#new-task').value='';$('#message').textContent='伙伴已来到桌面。可以关掉这个窗口，开始做事啦。';}));
+    renderManager();
+    $('#pet-size').addEventListener('input',safely(()=>{const percent=Number($('#pet-size').value);syncSizeControls(percent,true);return changePetSize(percent);}));
+    $('#pet-size-number').addEventListener('input',safely(()=>{const percent=validSizeNumber();if(percent!==null)return changePetSize(percent);}));
+    $('#pet-size-number').addEventListener('blur',()=>{if(validSizeNumber()===null){$('#message').textContent='伙伴大小请输入 20～200 之间的整数，已恢复上次设置。';syncSizeControls(sizePending??state.petSize,true);}});
+    $('#pet-size-number').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();if(validSizeNumber()!==null)event.target.blur();else event.target.reportValidity();}});
+    $('#reset-size').addEventListener('click',safely(()=>{syncSizeControls(100,true);return changePetSize(100);}));
+    $('#create-form').addEventListener('submit',safely(async event=>{event.preventDefault();await call('create',{text:$('#new-task').value});$('#new-task').value='';$('#message').textContent='伙伴已来到桌面。可以关掉这个窗口，开始做事啦。';}));
     $('#records').addEventListener('click',safely(()=>call('records')));$('#quit').addEventListener('click',safely(()=>call('quit')));
   } else if(view==='editor') {
     renderEditor();$('#title').addEventListener('input',scheduleSave);$('#note').addEventListener('input',scheduleSave);
