@@ -1,5 +1,7 @@
 # 三件事 · 像素伙伴（Windows 试用版 0.1.6）
 
+**简体中文** | [English](README.en.md)
+
 ## 使用
 
 先通过托盘或管理窗口退出旧版，再[下载 Windows 0.1.6](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe) 并双击运行，无需安装 Node.js。本机也可直接使用桌面“三件事·像素伙伴”快捷方式。已有任务、心得与大小设置会继续读取。
@@ -40,7 +42,7 @@ Windows 透明窗口用原生 `setShape` 按像素裁出角色身体与小手，
 
 离线字体为 Fusion Pixel 12px Proportional SC（SIL Open Font License），授权文件随软件打包。Electron 及 Chromium 的授权文件随运行环境一同分发。
 
-0.1.3 移除“回到桌面陪伴”按钮与图片上传、预览、排序功能，TXT 不再包含附图说明。旧版任务和文字记录仍可读取，旧数据中的附图字段保持兼容，不主动删除。
+0.1.3 简化管理窗口与纯文字记录输出，兼容旧版任务和文字记录。
 
 0.1.4 完成任务和补存 TXT 均直接写入 Windows 桌面，旧文件保持原位置。
 
