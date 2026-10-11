@@ -1,0 +1,53 @@
+:root { color-scheme:light; --font:'Fusion Pixel 12px Proportional SC','Microsoft YaHei',monospace; --ink:#604555; --border:#bbaeaa; --cream:#fffaf0; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--cream); color:var(--ink); font:14px/1.6 'Microsoft YaHei',sans-serif; }
+[hidden] { display:none!important; }
+button,input,textarea { color:inherit; border:2px solid var(--border); border-radius:0; background:#f6efdf; font:inherit; }
+button { padding:8px 12px; cursor:pointer; box-shadow:2px 2px 0 #dfd3c6; }
+button:hover { background:#eee4d2; }
+button:disabled { opacity:.55; cursor:default; }
+button:focus-visible,input:focus-visible,textarea:focus-visible { outline:2px solid #ce5d79; outline-offset:2px; }
+main { padding:22px; }
+h1 { font:24px/1.5 var(--font); margin:4px 0 10px; }
+.eyebrow,.hint { font-size:12px; color:#897a88; }
+header { border-bottom:2px solid #eadfd4; margin-bottom:20px; }
+#count { font-family:var(--font); }
+#create-form { display:flex; gap:10px; }
+#new-task { min-width:0; flex:1; padding:9px; }
+#create,.primary { background:#65506f; color:#fff8df; border-color:#65506f; }
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.toolbar button { font-size:12px; }
+.task-row { display:flex; gap:12px; align-items:center; border:2px solid #dfd3c6; padding:12px; margin:12px 0; background:#fffdf7; }
+.task-row canvas,#editor-art { flex-shrink:0; width:80px; height:48px; image-rendering:pixelated; }
+.task-info { flex:1; min-width:0; overflow-wrap:anywhere; }
+.task-info small { display:block; color:#897a88; }
+.task-actions { display:flex; flex-direction:column; gap:8px; }
+.task-actions button { font-size:12px; }
+details { margin-top:24px; } summary { cursor:pointer; }
+.empty { border:2px dashed #dfd3c6; padding:28px; text-align:center; color:#897a88; }
+.editor-head { display:flex; gap:12px; align-items:center; font:12px var(--font); margin-bottom:16px; }
+label { display:block; font:12px/1.5 var(--font); }
+textarea { display:block; margin-top:8px; width:100%; resize:vertical; padding:8px; font:24px/1.5 var(--font); font-synthesis:none; }
+#note { min-height:150px; }
+#complete { width:100%; font:12px/1.5 var(--font); padding:14px; }
+body.editor #editor { padding-bottom:100px; }
+body.editor #complete { position:fixed; bottom:18px; left:22px; width:calc(100% - 44px); z-index:4; }
+#message { margin:0; padding:0 22px 18px; color:#a13d5d; overflow-wrap:anywhere; font-size:12px; }
+body.pet,body.reward { background:transparent; overflow:hidden; }
+body.pet #message,body.reward #message { display:none; }
+#pet { display:block; width:120px; height:72px; padding:0; border:0; background:transparent; box-shadow:none; user-select:none; touch-action:none; }
+#pet canvas { display:block; width:120px; height:72px; image-rendering:pixelated; pointer-events:none; }
+#pet { cursor:pointer; }
+#pet.picked { cursor:grabbing; }
+#pet.picked canvas { transform-origin:50% 55%; animation:pickup .18s steps(4) forwards; }
+#pet.landing canvas { transform-origin:50% 55%; animation:putdown .22s steps(5) forwards; }
+@keyframes pickup { 0%{transform:scale(1)} 40%{transform:scale(1.08,.85)} 100%{transform:translateY(-5px) scale(.88,1.06) rotate(-3deg)} }
+@keyframes putdown { 0%{transform:translateY(-5px) scale(.88,1.06) rotate(-3deg)} 65%{transform:scale(1.08,.9)} 100%{transform:none} }
+#pet.departing { animation:depart .6s steps(8) forwards; pointer-events:none; }
+@keyframes depart { 0% { opacity:1; transform:scale(1); } 40% { transform:translateY(-4px) scale(1.1); } 100% { opacity:0; transform:translateY(12px) scale(.2); } }
+#reward { padding:18px; text-align:center; opacity:0; animation:reward-in .35s ease forwards; }
+#reward canvas { display:block; margin:0 auto; width:216px; height:216px; image-rendering:pixelated; filter:drop-shadow(0 8px 14px #c78f2840); }
+#reward-copy { display:inline-block; margin:10px 0 0; padding:10px; background:#fffaf0ed; border:2px solid #bbaeaa; font:24px/1.5 var(--font); }
+#reward-copy span:nth-child(7n+1){color:#bc496c} #reward-copy span:nth-child(7n+2){color:#b26a28} #reward-copy span:nth-child(7n+3){color:#8b7921} #reward-copy span:nth-child(7n+4){color:#418754} #reward-copy span:nth-child(7n+5){color:#308b91} #reward-copy span:nth-child(7n+6){color:#6275b3} #reward-copy span:nth-child(7n+7){color:#9b60ab}
+#reward.fading { animation:reward-out 1.8s ease forwards; }
+@keyframes reward-in { to { opacity:1; } } @keyframes reward-out { from {opacity:1} to {opacity:0} }

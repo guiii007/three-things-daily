@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>三件事 · 像素伙伴</title>
+  <link rel="stylesheet" href="assets/font/400.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="manager" hidden>
+    <header><div class="eyebrow">每天，专心做好三件事</div><h1>三件事 · 像素伙伴</h1><p id="count"></p></header>
+    <form id="create-form"><input id="new-task" maxlength="120" placeholder="今天想完成的一件事…" aria-label="新任务" required><button id="create" type="submit">召唤伙伴 ＋</button></form>
+    <div class="toolbar"><button id="records">打开 TXT 文件夹</button><button id="quit">退出软件</button></div>
+    <p class="hint">轻点伙伴写心得 · 按住半秒捏起拖动 · 松手放下<br>关闭此窗口后，伙伴仍在桌面；右下角托盘可重新打开。</p>
+    <section id="today-list" aria-label="今天的任务"></section>
+    <details id="history"><summary>过去的任务与记录</summary><section id="history-list"></section></details>
+    <p id="folder" class="hint"></p>
+  </main>
+  <main id="editor" hidden>
+    <div class="editor-head"><canvas id="editor-art" width="40" height="24"></canvas><span id="status"></span></div>
+    <label>这件事<textarea id="title" rows="2" maxlength="120" aria-label="任务内容"></textarea></label>
+    <p id="time" class="hint"></p>
+    <label>心得 / 灵感 / 想记录的话<textarea id="note" rows="4" maxlength="20000" placeholder="想到什么，就在这里写下来…" aria-label="心得与想法"></textarea></label>
+    <p id="save-status" class="hint">写下的内容会自动保存</p>
+    <button id="complete" class="primary">这件事完成啦 √</button>
+  </main>
+  <button id="pet" hidden aria-label="轻点写心得，按住半秒捏起拖动"><canvas width="40" height="24"></canvas></button>
+  <main id="reward" hidden><canvas width="36" height="36" aria-label="暖心的像素笑脸"></canvas><p id="reward-copy"></p></main>
+  <p id="message" role="status" aria-live="polite"></p>
+  <script src="art.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

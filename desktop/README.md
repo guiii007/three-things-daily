@@ -1,0 +1,43 @@
+# 三件事 · 像素伙伴（Windows 试用版 0.1.3）
+
+## 使用
+
+先通过托盘或管理窗口退出旧版，再[下载 Windows 0.1.3](https://github.com/guiii007/three-things-daily/releases/download/v0.1.3/ThreeThings-0.1.3-Windows.exe) 并双击运行，无需安装 Node.js。已有任务和记录会继续使用。本地构建文件位于项目 `dist` 文件夹。
+
+1. 写下一件事，点击“召唤伙伴”。当天依次生成红、黄、绿三只像素胶囊。
+2. 关闭管理窗口，胶囊仍会在其他软件上方显示。
+3. 单击胶囊打开任务框，写心得、修改任务，文字内容自动保存。
+4. 轻点胶囊立即打开任务框。按住胶囊约半秒，出现捏起动画后，保持按住鼠标移动；松手后落下并保存位置。长按不弹任务框，无需双击。
+5. 点击“这件事完成啦 √”：自动保存 TXT，胶囊消失，暖心笑脸和彩色鼓励文字出现后缓慢淡去。
+6. 双击右下角系统托盘里的胶囊图标重新打开管理窗口；右键可隐藏伙伴或退出。
+
+每天最多创建三件，完成后不释放当天名额。新的一天重新计算；过去的记录仍在历史列表中，未完成的伙伴继续保留。
+
+TXT 保存在 Windows 的“文档／三件事／完成记录／日期”中。软件内“打开 TXT 文件夹”可直接打开；“补存 TXT”可再次保存同次完成记录。重新开启并再次完成任务会新增文件，保留上一次记录。
+
+任务、心得和位置保存在 `%APPDATA%/three-things-companion/tasks.json`，不上传服务器。TXT 是完成时的纯文字快照；备份时建议同时备份此数据文件和完成记录文件夹。
+
+当前桌面版与网页 `index.html`、浏览器试用版的数据分别保存；不会自动读取旧浏览器记录。原网页可继续独立使用。桌面版是首个 Windows 试用版本，暂未提供自动更新和其他角色；角色皮肤字段已预留。
+
+## 开发
+
+```powershell
+npm.cmd install
+node node_modules/electron/install.js
+npm.cmd run prepare:assets
+npm.cmd start
+npm.cmd test
+npm.cmd run build
+```
+
+`desktop/test/smoke.js` 使用 Playwright 启动真实 Electron，在 `.desktop-test` 目录隔离测试数据。开发者安装 Playwright 后可运行 `npm.cmd run test:desktop`；Codex 环境自动使用现有 Playwright。
+
+Windows 透明窗口用原生 `setShape` 按像素裁出角色身体与小手，透明部分穿透鼠标。原生文件写入仅在主进程进行；渲染页面禁用 Node.js，使用沙箱与上下文隔离。
+
+0.1.2 改为轻点 / 长按交互：轻点松手立即弹框；按住 500ms 捏起并拖动；松手落下。主进程直接读取 Windows 的当前鼠标位置和左键按下状态，不依赖透明窗口收到移动或松手事件。仅在角色被按住期间采样，不安装全局鼠标钩子、不记录输入。
+
+`npm.cmd test` 覆盖长按时间边界、移出窗口、松手最终位置和短按误触；`npm.cmd run test:interaction` 检查轻点不再等待双击。手动原生输入测试可设置 `CAPSULE_TEST_ROOT` 为独立测试目录，并设置 `CAPSULE_NATIVE_UI_TEST=1`，角色窗口会扩大且有边框以供 Windows 测试工具选择；该模式不使用正式任务数据。
+
+离线字体为 Fusion Pixel 12px Proportional SC（SIL Open Font License），授权文件随软件打包。Electron 及 Chromium 的授权文件随运行环境一同分发。
+
+0.1.3 移除“回到桌面陪伴”按钮与图片上传、预览、排序功能，TXT 不再包含附图说明。旧版任务和文字记录仍可读取，旧数据中的附图字段保持兼容，不主动删除。
