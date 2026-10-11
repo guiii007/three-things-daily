@@ -6,6 +6,40 @@ Focus on three things each day, with cute pixel capsules keeping you company on 
 
 [Download Windows v0.1.6](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe) · [Browse releases](https://github.com/guiii007/three-things-daily/releases) · [Open the web app](https://guiii007.github.io/three-things-daily/)
 
+## See how it works in five screenshots
+
+### 1. Write down three things and meet your companions
+
+Summon up to three capsules each day—red, yellow, and green—to accompany your tasks. Adjust their size to suit your screen and preferences.
+
+![Three tasks in the manager, with red, yellow, and green pixel companions at the bottom right of the desktop](docs/screenshots/01-desktop-companions.png)
+
+### 2. Tap a companion to capture your thoughts
+
+Each companion belongs to one task. Click a character to open its task window and record reflections, ideas, or next steps. Text is saved automatically.
+
+![Three companions each open their own task and notes window](docs/screenshots/02-task-notes.png)
+
+### 3. Finish a task and receive a warm smile
+
+Click “这件事完成啦 √” (Task complete). Its companion leaves with an animation, followed by a pixel smile and colorful encouragement that gently fade away.
+
+![A pixel smile and colorful encouragement appear after the first task is completed](docs/screenshots/03-first-completion.png)
+
+### 4. Keep going, one task at a time
+
+Completed companions leave while unfinished ones stay with you. Each completion brings encouragement, and the manager updates your progress.
+
+![After another task is completed, only the unfinished green companion remains on the desktop](docs/screenshots/04-keep-going.png)
+
+### 5. Keep a record: TXT files appear on your desktop
+
+Every completed task generates a plain-text TXT file with its content, timestamps, and notes. The red boxes and arrows highlight the desktop records.
+
+![All three tasks are complete, with red boxes and arrows highlighting automatically saved desktop TXT files](docs/screenshots/05-desktop-txt-records.png)
+
+[Download the Windows app and start your three things today](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe)
+
 ## Desktop features
 
 - **Three things a day:** Create up to three companions each day: red, yellow, then green pixel capsules. Completing a task does not free up a daily slot. The limit resets the next day.

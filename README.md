@@ -6,6 +6,40 @@
 
 [下载 Windows v0.1.6](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe) · [查看发布版本](https://github.com/guiii007/three-things-daily/releases) · [网页版在线使用](https://guiii007.github.io/three-things-daily/)
 
+## 五张图，看懂如何使用
+
+### 1. 写下三件事，让伙伴来到桌面
+
+每天最多召唤红、黄、绿三个胶囊，陪你一起完成任务；大小可以按屏幕和喜好调节。
+
+![管理窗口中的三件任务，以及桌面右下角的红黄绿像素伙伴](docs/screenshots/01-desktop-companions.png)
+
+### 2. 轻点伙伴，随时记录心得
+
+每个伙伴对应一件事。点击角色就能打开任务框，记录感悟、灵感和下一步想法，文字自动保存。
+
+![三只伙伴分别打开自己的任务与心得窗口](docs/screenshots/02-task-notes.png)
+
+### 3. 完成一件事，收到一个暖心笑脸
+
+点击“这件事完成啦 √”，对应的伙伴会带着动画离开，像素笑脸和彩色鼓励文字出现，再慢慢淡去。
+
+![完成第一件任务后，桌面出现像素笑脸和彩色鼓励文字](docs/screenshots/03-first-completion.png)
+
+### 4. 一件一件完成，伙伴陪你走到最后
+
+完成的伙伴逐渐离开，未完成的继续陪伴。每次完成都有鼓励文字，管理窗口也会更新进度。
+
+![又完成一件任务后，桌面只剩下一只待完成的绿色伙伴](docs/screenshots/04-keep-going.png)
+
+### 5. 努力留下记录，TXT 自动保存到桌面
+
+每件事完成后都会生成纯文字 TXT，保存任务内容、时间和心得。图中红框和箭头标出了桌面记录文件。
+
+![三件任务均已完成，红框和箭头标出桌面自动保存的 TXT 文件](docs/screenshots/05-desktop-txt-records.png)
+
+[下载 Windows 版，开始今天的三件事](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe)
+
 ## 桌面版功能
 
 - **每天三件事**：每天最多创建三个伙伴，依次为红、黄、绿像素胶囊。完成后不释放当天名额，新的一天重新计算。
