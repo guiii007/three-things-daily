@@ -18,11 +18,27 @@ function saveEditor() {
 function scheduleSave() { dirty = true; $('#save-status').textContent = '正在保存…'; clearTimeout(saveTimer); saveTimer = setTimeout(() => saveEditor().catch(() => {}), 300); }
 function renderEditor() {
   const task = state.tasks.find(t => t.id === id); if (!task) return;
-  if (!editingLoaded) { $('#title').value = task.text; $('#note').value = task.note; editingLoaded = true; }
+  if (!editingLoaded) { $('#title').value = task.text; $('#note').value = task.note;
+    for(const [selector,key] of [['#title','titleHeight'],['#note','noteHeight']])if(state.editorLayout[key]!==null)$(selector).style.height=state.editorLayout[key]+'px';
+    editingLoaded = true; }
   drawCapsule($('#editor-art'), task.slot);
   $('#status').textContent = task.done ? '这件事已完成' : '这件事正在进行中';
   $('#time').textContent = `创建 ${new Date(task.createdAt).toLocaleString('zh-CN')}` + (task.completedAt ? ` · 完成 ${new Date(task.completedAt).toLocaleString('zh-CN')}` : '');
   $('#complete').textContent = task.done ? '重新开启这件事' : '这件事完成啦 √';
+}
+let layoutTimer, layoutQueue=Promise.resolve(), layoutDirty=false, layoutSaving=0, savedTextHeights;
+function textHeights() { return { titleHeight: Math.round($('#title').getBoundingClientRect().height), noteHeight: Math.round($('#note').getBoundingClientRect().height) }; }
+function captureLayout() { const value=textHeights();if(JSON.stringify(value)!==JSON.stringify(savedTextHeights))layoutDirty=true; }
+function saveLayout() {
+  clearTimeout(layoutTimer);captureLayout();if(!layoutDirty)return layoutQueue;
+  const value=textHeights();layoutDirty=false;savedTextHeights=value;layoutSaving++;
+  layoutQueue=layoutQueue.catch(()=>{}).then(()=>call('editorLayout',value)).catch(e=>{layoutDirty=true;error(e);throw e;}).finally(()=>layoutSaving--);
+  return layoutQueue;
+}
+function observeTextHeights() {
+  savedTextHeights=textHeights();
+  const observer=new ResizeObserver(()=>{captureLayout();if(layoutDirty){clearTimeout(layoutTimer);layoutTimer=setTimeout(()=>saveLayout().catch(()=>{}),200);}});
+  observer.observe($('#title'));observer.observe($('#note'));
 }
 function taskRow(task) {
   const row = document.createElement('div'); row.className = 'task-row'; row.dataset.id = task.id;
@@ -104,14 +120,15 @@ async function init() {
     $('#create-form').addEventListener('submit',safely(async event=>{event.preventDefault();await call('create',{text:$('#new-task').value});$('#new-task').value='';$('#message').textContent='伙伴已来到桌面。可以关掉这个窗口，开始做事啦。';}));
     $('#records').addEventListener('click',safely(()=>call('records')));$('#quit').addEventListener('click',safely(()=>call('quit')));
   } else if(view==='editor') {
-    renderEditor();$('#title').addEventListener('input',scheduleSave);$('#note').addEventListener('input',scheduleSave);
+    renderEditor();observeTextHeights();$('#title').addEventListener('input',scheduleSave);$('#note').addEventListener('input',scheduleSave);
     $('#complete').addEventListener('click',safely(async()=>{
       if(completing)return;completing=true;$('#complete').disabled=true;
-      try{clearTimeout(saveTimer);await saveEditor();const task=state.tasks.find(t=>t.id===id);await call(task.done?'reopen':'complete',{id,patch:patch()});dirty=false;if(task.done)await call('close');}
+      try{clearTimeout(saveTimer);await Promise.all([saveEditor(),saveLayout()]);const task=state.tasks.find(t=>t.id===id);await call(task.done?'reopen':'complete',{id,patch:patch()});dirty=false;if(task.done)await call('close');}
       finally{completing=false;$('#complete').disabled=false;}
     }));
-    // 关闭时先完成待保存内容，防止最后一笔心得丢失。
-    window.addEventListener('beforeunload',event=>{if(dirty||saving){event.preventDefault();event.returnValue='';saveEditor().then(()=>call('close')).catch(()=>{});}});
+    // 主进程先拦截关闭，保存文字和尺寸成功后再关闭，避免浏览器离开提示。
+    let editorClosing=false;
+    window.companion.onCloseRequest(async()=>{if(editorClosing)return;editorClosing=true;try{await Promise.all([saveEditor(),saveLayout()]);await call('close');}catch(e){editorClosing=false;error(e);}});
   } else if(view==='pet') await initPet();
   else if(view==='reward') {
     drawSmile($('#reward canvas'));const lines=params.get('all')==='1'?['三件事都完成啦，今天辛苦了！','今天也过得很棒，为你鼓掌！']:['又做好一件事啦，为你开心！','你认真努力的样子，闪闪发光。','一步一步，已经走得很棒啦！','小小的坚持，也有大大的力量。','今天的你，值得一个大大的拥抱。'];

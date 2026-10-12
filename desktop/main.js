@@ -97,11 +97,27 @@ function showEditor(id) {
   if (editors.has(id)) { const win = editors.get(id); win.show(); win.focus(); return; }
   const pet = pets.get(id), origin = pet ? pet.getBounds() : { ...petPosition(task), ...petWindowDimensions(store.data.petSize) };
   const area = screen.getDisplayMatching(origin).workArea;
+  const width = Math.min(area.width, Math.max(400, store.data.editorLayout.width));
+  const height = Math.min(area.height, Math.max(430, store.data.editorLayout.height));
   let x = origin.x + origin.width + 16;
-  if (x + 430 > area.x + area.width) x = origin.x - 446;
-  const pos = clamp({ x, y: origin.y - 360, width: 430, height: 530 });
-  const win = createWindow({ ...pos, width: 430, height: 530, minWidth: 400, minHeight: 430, alwaysOnTop: true, title: '任务与心得' }, { view: 'editor', id });
-  editors.set(id, win); win.once('ready-to-show', () => win.show()); win.on('closed', () => editors.delete(id));
+  if (x + width > area.x + area.width) x = origin.x - width - 16;
+  const pos = clamp({ x, y: origin.y - Math.min(360, height), width, height });
+  const win = createWindow({ ...pos, width, height, minWidth: Math.min(400, area.width), minHeight: Math.min(430, area.height), alwaysOnTop: true, title: '任务与心得' }, { view: 'editor', id });
+  let resizeTimer, adjusted = false;
+  const saveSize = () => {
+    clearTimeout(resizeTimer);
+    if (win.isDestroyed()) return;
+    const bounds = win.getNormalBounds();
+    if (!adjusted && bounds.width === width && bounds.height === height) return;
+    try { store.setEditorLayout({ width: bounds.width, height: bounds.height }); }
+    catch (error) { dialog.showErrorBox('窗口大小暂时未能保存', error.message); }
+  };
+  win.on('resize', () => { if (!win.isVisible() || win.isMaximized() || win.isMinimized()) return; adjusted = true; clearTimeout(resizeTimer); resizeTimer = setTimeout(saveSize, 200); });
+  win.on('close', event => {
+    saveSize();
+    if (!win.editorCloseReady) { event.preventDefault(); win.webContents.send('companion:close-request'); }
+  });
+  editors.set(id, win); win.once('ready-to-show', () => win.show()); win.on('closed', () => { clearTimeout(resizeTimer); editors.delete(id); });
 }
 function showReward(item) {
   rewardQueue.push(item); playReward();
@@ -139,6 +155,10 @@ ipcMain.handle('companion:call', async (event, method, value) => {
       case 'state': result = state(); break;
       case 'create': requireManager(); result = store.create(value.text); syncPets(); broadcast(); break;
       case 'editor': requireTask(); showEditor(id); break;
+      case 'editorLayout': {
+        if (context.view !== 'editor') throw new Error('此操作需要在任务窗口进行。');
+        store.setEditorLayout({ titleHeight: value.titleHeight, noteHeight: value.noteHeight }); result = store.data.editorLayout; break;
+      }
       case 'update': requireTask(); result = store.update(id, value.patch); broadcast(); break;
       case 'complete': {
         requireTask(); const done = store.complete(id, value.patch); result = done.task;
@@ -172,7 +192,9 @@ ipcMain.handle('companion:call', async (event, method, value) => {
       case 'pressCancel': {
         if(context.view !== 'pet')throw new Error('操作无效。');finishGesture(context.id,true);break;
       }
-      case 'close': context.win.close(); break;
+      case 'close':
+        if (context.view === 'editor') context.win.editorCloseReady = true;
+        context.win.close(); if (quitting) app.quit(); break;
       default: throw new Error('未知操作。');
     }
     return { ok: true, value: result };

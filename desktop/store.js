@@ -18,21 +18,34 @@ function record(task) {
   const text = ['三件事 · 单项完成记录', '========================================', `任务内容：${task.text}`, '完成状态：已完成', `创建时间：${timestamp(task.createdAt)}`, `完成时间：${timestamp(task.completedAt)}`, '', '心得 / 灵感 / 想记录的话：', task.note.trim() || '（未填写）', '', '========================================'].join('\r\n');
   return { filename, text: '\ufeff' + text };
 }
+const defaultEditorLayout = { width: 430, height: 530, titleHeight: null, noteHeight: null };
+function validEditorLayout(layout) {
+  return layout && ['width','height'].every(key => Number.isInteger(layout[key]) && layout[key] >= 100 && layout[key] <= 10000)
+    && ['titleHeight','noteHeight'].every(key => layout[key] === null || (Number.isInteger(layout[key]) && layout[key] >= (key === 'noteHeight' ? 150 : 24) && layout[key] <= 10000));
+}
 class Store {
   constructor(file, recordsDir) {
     this.file = file;
     this.recordsDir = recordsDir;
-    this.data = { version: 1, tasks: [], rewardCount: 0, petSize: 100 };
+    this.data = { version: 1, tasks: [], rewardCount: 0, petSize: 100, editorLayout: { ...defaultEditorLayout } };
     if (fs.existsSync(file)) {
       const data = JSON.parse(fs.readFileSync(file, 'utf8'));
       if (data.version !== 1 || !Array.isArray(data.tasks) || !Number.isInteger(data.rewardCount) || data.rewardCount < 0 || data.tasks.some(t => !t || !/^[0-9a-f-]{36}$/.test(t.id) || !/^\d{4}-\d{2}-\d{2}$/.test(t.day) || ![0,1,2].includes(t.slot) || typeof t.text !== 'string' || !t.text.trim() || t.text.length > 120 || typeof t.note !== 'string' || t.note.length > 20000 || typeof t.done !== 'boolean' || !Number.isFinite(t.createdAt) || (t.done && !Number.isFinite(t.completedAt)) || (t.position !== null && (!t.position || !Number.isFinite(t.position.x) || !Number.isFinite(t.position.y))))) throw new Error('数据文件格式不正确，请保留文件以便恢复。');
       // 兼容旧版附图字段，保留原数据，但不再提供图片操作。
       if (data.petSize === undefined) data.petSize = 100;
       if (!Number.isInteger(data.petSize) || data.petSize < 20 || data.petSize > 200) throw new Error('伙伴大小设置无效，请保留数据文件以便恢复。');
+      if (data.editorLayout === undefined) data.editorLayout = { ...defaultEditorLayout };
+      if (!validEditorLayout(data.editorLayout)) throw new Error('任务窗口大小设置无效，请保留数据文件以便恢复。');
       this.data = data;
     }
   }
   snapshot() { return structuredClone(this.data); }
+  setEditorLayout(patch) {
+    const next = this.snapshot();
+    for (const key of Object.keys(defaultEditorLayout)) if (Object.hasOwn(patch, key)) next.editorLayout[key] = patch[key];
+    if (!validEditorLayout(next.editorLayout)) throw new Error('任务窗口或文本框大小无效。');
+    if (JSON.stringify(next.editorLayout) !== JSON.stringify(this.data.editorLayout)) this.commit(next);
+  }
   setPetSize(percent) {
     if (!Number.isInteger(percent) || percent < 20 || percent > 200) throw new Error('伙伴大小需在 20% 到 200% 之间。');
     const next = this.snapshot(); next.petSize = percent; this.commit(next);

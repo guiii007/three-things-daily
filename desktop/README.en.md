@@ -1,10 +1,10 @@
-# Three Things · Pixel Companions (Windows trial v0.1.6)
+# Three Things · Pixel Companions (Windows trial v0.1.7)
 
 [简体中文](README.md) | **English**
 
 ## Usage
 
-Quit the old version using the manager or system tray, then [download Windows v0.1.6](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
+Quit the old version using the manager or system tray, then [download Windows v0.1.7](https://github.com/guiii007/three-things-daily/releases/download/v0.1.7/ThreeThings-0.1.7-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
 
 1. Enter a task and click “召唤伙伴” (Summon companion). Up to three pixel capsules are created each day, in red, yellow, and green order.
 2. Close the manager to keep your companions above other apps.
@@ -48,6 +48,7 @@ File writes run in the main process. Renderer pages have Node.js disabled, with 
 - **0.1.3:** Simplified the manager and plain-text records while retaining compatibility with existing tasks and notes.
 - **0.1.4:** Completion records and TXT re-exports are saved directly to the Windows desktop.
 - **0.1.5:** Added a 20%–200% size slider and reset button, SVG pixel rendering, and matching scaled click areas.
+- **0.1.7:** Remembers the last task-window dimensions and text-field heights across closing, reopening, restarting, and newly opened task editors. Windows fit the available screen area. Pending text and field sizes are saved before closing.
 - **0.1.6:** Added a number field with immediate adjustment, slider synchronization, and invalid-input protection.
 
 ## Font and runtime licenses

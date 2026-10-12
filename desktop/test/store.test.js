@@ -73,3 +73,15 @@ test('伙伴大小保存、范围校验以及旧版默认 100%',t=>{
   const legacy=store.snapshot();delete legacy.petSize;fs.writeFileSync(store.file,JSON.stringify(legacy));
   const restored=new Store(store.file,store.recordsDir);assert.equal(restored.data.petSize,100);assert.equal(restored.data.tasks.length,1);
 });
+
+test('任务窗口与文本框大小记住最后调整，并兼容旧数据',t=>{
+  const {store}=setup(t);const task=store.create('保留我的心得');store.update(task.id,{note:'已有内容'});
+  assert.deepEqual(store.data.editorLayout,{width:430,height:530,titleHeight:null,noteHeight:null});
+  store.setEditorLayout({width:680,height:720});store.setEditorLayout({titleHeight:132,noteHeight:340});
+  store.setEditorLayout({width:640,height:680,noteHeight:280});
+  const restored=new Store(store.file,store.recordsDir);
+  assert.deepEqual(restored.data.editorLayout,{width:640,height:680,titleHeight:132,noteHeight:280});assert.equal(restored.task(task.id).note,'已有内容');
+  for(const invalid of [{width:NaN},{height:99},{noteHeight:149},{titleHeight:'132'},{width:10001}])assert.throws(()=>restored.setEditorLayout(invalid),/大小无效/);
+  const legacy=store.snapshot();delete legacy.editorLayout;fs.writeFileSync(store.file,JSON.stringify(legacy));
+  assert.deepEqual(new Store(store.file,store.recordsDir).data.editorLayout,{width:430,height:530,titleHeight:null,noteHeight:null});
+});

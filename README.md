@@ -4,7 +4,7 @@
 
 每天专心做好三件事，让可爱的像素胶囊在桌面上陪你一起完成。轻点伙伴记录心得，完成任务后收获暖心笑脸，并自动生成纯文字 TXT。
 
-[下载 Windows v0.1.6](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe) · [查看发布版本](https://github.com/guiii007/three-things-daily/releases) · [网页版在线使用](https://guiii007.github.io/three-things-daily/)
+[下载 Windows v0.1.7](https://github.com/guiii007/three-things-daily/releases/download/v0.1.7/ThreeThings-0.1.7-Windows.exe) · [查看发布版本](https://github.com/guiii007/three-things-daily/releases) · [网页版在线使用](https://guiii007.github.io/three-things-daily/)
 
 ## 五张图，看懂如何使用
 
@@ -38,7 +38,7 @@
 
 ![三件任务均已完成，红框和箭头标出桌面自动保存的 TXT 文件](docs/screenshots/05-desktop-txt-records.png)
 
-[下载 Windows 版，开始今天的三件事](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe)
+[下载 Windows 版，开始今天的三件事](https://github.com/guiii007/three-things-daily/releases/download/v0.1.7/ThreeThings-0.1.7-Windows.exe)
 
 ## 桌面版功能
 
@@ -46,6 +46,7 @@
 - **桌面陪伴**：切换其他软件时伙伴仍在上方显示；关闭管理窗口后仍可陪伴，系统托盘可重新打开管理窗口或隐藏伙伴。
 - **自由摆放**：轻点角色打开任务与心得，按住约半秒后捏起拖动，松手放下并保存位置。
 - **可调大小**：通过滑块或数字框设置 20%～200%，实时同步、自动保存，可恢复 100%。角色使用 SVG 像素方块绘制，点击区域随大小变化。
+- **记住输入框大小**：自动保留最后调整的任务窗口宽高和文本框高度，关闭、重新打开或重启后仍可恢复；新打开的其他任务框也沿用这一设置。
 - **纯文字记录**：修改任务、记录心得与灵感，内容自动保存。
 - **完成反馈**：角色带着动画消失，暖心像素笑脸和彩色鼓励文字出现，再慢慢淡去。
 - **桌面 TXT**：完成时自动将任务内容、时间与心得保存为桌面 TXT；已完成的任务可“补存 TXT”。
@@ -63,7 +64,7 @@
 
 ## 数据与记录
 
-桌面版数据保存在 `%APPDATA%/three-things-companion/tasks.json`，包括任务、心得、位置与大小设置，不上传服务器。完成记录是保存当时内容的纯文字快照，直接放在 Windows 桌面，不创建日期子文件夹。
+桌面版数据保存在 `%APPDATA%/three-things-companion/tasks.json`，包括任务、心得、位置、伙伴大小和任务窗口尺寸设置，不上传服务器。完成记录是保存当时内容的纯文字快照，直接放在 Windows 桌面，不创建日期子文件夹。
 
 旧版生成的 TXT 保留在原位置；使用“补存 TXT”可以将记录重新保存到桌面。重新开启并再次完成任务会生成新的 TXT，保留上一次完成记录。备份时建议同时保存任务数据文件和 TXT 文件。
 

@@ -4,7 +4,7 @@
 
 Focus on three things each day, with cute pixel capsules keeping you company on your desktop. Tap a companion to write down your thoughts. Finish a task to see a warm smile and automatically save a plain-text TXT record.
 
-[Download Windows v0.1.6](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe) · [Browse releases](https://github.com/guiii007/three-things-daily/releases) · [Open the web app](https://guiii007.github.io/three-things-daily/)
+[Download Windows v0.1.7](https://github.com/guiii007/three-things-daily/releases/download/v0.1.7/ThreeThings-0.1.7-Windows.exe) · [Browse releases](https://github.com/guiii007/three-things-daily/releases) · [Open the web app](https://guiii007.github.io/three-things-daily/)
 
 ## See how it works in five screenshots
 
@@ -38,7 +38,7 @@ Every completed task generates a plain-text TXT file with its content, timestamp
 
 ![All three tasks are complete, with red boxes and arrows highlighting automatically saved desktop TXT files](docs/screenshots/05-desktop-txt-records.png)
 
-[Download the Windows app and start your three things today](https://github.com/guiii007/three-things-daily/releases/download/v0.1.6/ThreeThings-0.1.6-Windows.exe)
+[Download the Windows app and start your three things today](https://github.com/guiii007/three-things-daily/releases/download/v0.1.7/ThreeThings-0.1.7-Windows.exe)
 
 ## Desktop features
 
@@ -46,6 +46,7 @@ Every completed task generates a plain-text TXT file with its content, timestamp
 - **Desktop company:** Companions stay above other apps. Closing the manager keeps them on your desktop; use the system tray to reopen the manager or hide your companions.
 - **Free placement:** Tap a character to open its task and notes. Hold for about half a second to pick it up, drag it, and release to save its position.
 - **Adjustable size:** Set 20%–200% using the slider or number field. Both controls stay in sync, changes are saved automatically, and you can reset to 100%. Characters use SVG pixel blocks, with matching click areas as they resize.
+- **Remembered editor size:** The last task-window width and height and text-field heights are saved. They are restored after closing, reopening, or restarting, and shared by newly opened task editors.
 - **Text notes:** Edit tasks and capture thoughts or ideas, with automatic saving.
 - **Completion feedback:** The companion disappears with an animation, followed by a pixel smile and colorful encouragement that gently fade away.
 - **Desktop TXT records:** Completing a task automatically saves its text, timestamps, and notes to a TXT file on your Windows desktop. Completed tasks can be exported again.
@@ -63,7 +64,7 @@ Before upgrading, quit the old version using the manager or system tray, then la
 
 ## Data and records
 
-Desktop app data is stored in `%APPDATA%/three-things-companion/tasks.json`, including tasks, notes, positions, and size settings. It is not uploaded to a server. Completion records are plain-text snapshots saved directly to the Windows desktop, without date subfolders.
+Desktop app data is stored in `%APPDATA%/three-things-companion/tasks.json`, including tasks, notes, positions, companion sizes, and editor dimensions. It is not uploaded to a server. Completion records are plain-text snapshots saved directly to the Windows desktop, without date subfolders.
 
 TXT files created by older versions remain in their original location. Click “补存 TXT” (Export TXT again) to save a record to your desktop. Reopening and completing a task again creates a new TXT file while preserving the previous completion record. Back up both the task data file and your TXT files.
 
