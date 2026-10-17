@@ -1,10 +1,10 @@
-# Three Things · Pixel Companions (Windows trial v0.1.7)
+# Three Things · Pixel Companions (Windows trial v0.3.1)
 
 [简体中文](README.md) | **English**
 
 ## Usage
 
-Quit the old version using the manager or system tray, then [download Windows v0.1.7](https://github.com/guiii007/three-things-daily/releases/download/v0.1.7/ThreeThings-0.1.7-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
+Quit the old version using the manager or system tray, then [download Windows v0.3.1](https://github.com/guiii007/three-things-daily/releases/download/v0.3.1/ThreeThings-0.3.1-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
 
 1. Enter a task and click “召唤伙伴” (Summon companion). Up to three pixel capsules are created each day, in red, yellow, and green order.
 2. Close the manager to keep your companions above other apps.
@@ -14,7 +14,7 @@ Quit the old version using the manager or system tray, then [download Windows v0
 6. Double-click the capsule icon in the system tray to reopen the manager. Right-click to hide companions or quit.
 7. Use the size slider or number field to set 20%–200%. Changes apply immediately, stay in sync, and are saved. Use “恢复 100%” (Reset to 100%) to restore the default. Blank, fractional, or out-of-range inputs are not applied; leaving the field restores the last valid value.
 
-Completing a task does not free up its daily slot. The daily limit resets the next day. Past tasks remain in history, and unfinished companions remain on the desktop.
+Completing a task does not free up its daily slot. The daily limit resets the next day. Past tasks remain in history, and unfinished tasks stay in history without automatically reappearing on later days. Create each day’s tasks manually. “Continue tomorrow” records progress rather than automatically creating tomorrow’s companions.
 
 ## Data and TXT files
 
@@ -22,7 +22,7 @@ TXT files are saved directly to the Windows desktop, without date subfolders. �
 
 Tasks, notes, positions, and size settings are stored in `%APPDATA%/three-things-companion/tasks.json` and are not uploaded to a server. TXT records are plain-text snapshots. Back up both this data file and your TXT files.
 
-The desktop app, original `index.html`, and browser prototype store data separately. Browser records are not imported automatically. The original web app remains usable independently. Automatic updates and additional characters are not yet available.
+The desktop app, original `index.html`, and browser prototype store data separately. Browser records are not imported automatically. The original web app remains usable independently. A local Companion Plaza and custom companion imports are available; automatic updates are not yet supported.
 
 ## Development
 
@@ -54,3 +54,11 @@ File writes run in the main process. Renderer pages have Node.js disabled, with 
 ## Font and runtime licenses
 
 The offline font is Fusion Pixel 12px Proportional SC, licensed under the SIL Open Font License. Its license is distributed with the app. Electron and Chromium license files are included with the runtime.
+
+## Companion Plaza and AI creation
+
+Click “伙伴广场” in the manager to select a capsule, a detailed mint-green chick, or an imported companion. The chick’s belly band changes between red, yellow, and green. Selection applies to today’s unfinished tasks and future tasks without creating extra tasks.
+
+Click “导出 AI 创作包” to export a self-contained kit with AGENTS.md, SPEC.md, a template, and Node.js validation and preview tools. Give the folder to your own agent, then use “导入伙伴” to import the resulting .companion.json file and select it. No app source, API key, or marketplace account is required. Custom files are stored in `%APPDATA%/three-things-companion/companions`.
+
+The chick tray menu includes optional launch at login, off by default. The manager and tray show the current version. Quit the old app before upgrading; closing its manager only hides the window.

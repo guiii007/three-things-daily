@@ -12,3 +12,9 @@ test('最小、默认、最大尺寸，像素点击区域缩放不越界',()=>{
   }
   assert.deepEqual(scaledShape([{x:12,y:3,width:20,height:1}],200),[{x:72,y:18,width:120,height:6}]);
 });
+
+test('96×96 小鸡保持正方形比例，点击区域同步缩放',()=>{
+  assert.deepEqual(petDimensions(100,96,96),{width:120,height:120});
+  assert.deepEqual(petDimensions(200,96,96),{width:240,height:240});
+  assert.deepEqual(scaledShape([{x:24,y:48,width:48,height:4}],200,96,96),[{x:60,y:120,width:120,height:10}]);
+});

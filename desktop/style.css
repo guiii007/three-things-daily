@@ -30,8 +30,9 @@ label { display:block; font:12px/1.5 var(--font); }
 textarea { display:block; margin-top:8px; width:100%; resize:vertical; padding:8px; font:24px/1.5 var(--font); font-synthesis:none; }
 #note { min-height:150px; }
 #complete { width:100%; font:12px/1.5 var(--font); padding:14px; }
-body.editor #editor { padding-bottom:100px; }
-body.editor #complete { position:fixed; bottom:18px; left:22px; width:calc(100% - 44px); z-index:4; }
+body.editor #editor { padding-bottom:155px; }
+.editor-actions { position:fixed; bottom:18px; left:22px; width:calc(100% - 44px); z-index:4; display:flex; flex-direction:column; gap:10px; background:var(--cream); }
+#defer { width:100%; padding:10px; font:12px/1.5 var(--font); background:#f5e7ca; }
 #message { margin:0; padding:0 22px 18px; color:#a13d5d; overflow-wrap:anywhere; font-size:12px; }
 body.pet,body.reward { background:transparent; overflow:hidden; }
 body.pet #message,body.reward #message { display:none; }
@@ -59,3 +60,14 @@ body.pet #message,body.reward #message { display:none; }
 .size-slider { display:flex; align-items:center; gap:8px; font-size:11px; }
 #pet-size { min-width:60px; width:100%; flex:1; accent-color:#ce5d79; cursor:pointer; }
 #reset-size { padding:4px 6px; white-space:nowrap; }
+
+.companion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.companion-card{border:2px solid #dfd3c6;background:#fffdf7;padding:16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.companion-card canvas{width:160px;height:96px;image-rendering:pixelated}
+.companion-card h2{font:18px var(--font);margin:0}.companion-card p{font-size:13px;flex:1}.companion-card small{color:#897a88}
+.creator-panel{margin-top:24px;border-top:2px solid #dfd3c6;padding-top:12px}.creator-panel h2{font:18px var(--font)}.creator-panel p{font-size:13px}
+#agent-prompt{font:13px/1.7 'Microsoft YaHei',sans-serif;min-height:110px;background:#fffdf7}
+
+.task-row canvas,#editor-art,.companion-card canvas{object-fit:contain}
+
+#app-version{font:12px/1.5 'Microsoft YaHei',sans-serif;color:#897a88;white-space:nowrap}

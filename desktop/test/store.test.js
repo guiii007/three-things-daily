@@ -85,3 +85,31 @@ test('任务窗口与文本框大小记住最后调整，并兼容旧数据',t=>
   const legacy=store.snapshot();delete legacy.editorLayout;fs.writeFileSync(store.file,JSON.stringify(legacy));
   assert.deepEqual(new Store(store.file,store.recordsDir).data.editorLayout,{width:430,height:530,titleHeight:null,noteHeight:null});
 });
+
+test('部分完成保存今日进度，保留未完成状态、心得和每日名额',t=>{
+  const {isDeferred,tomorrowKey}=require('../store');const {store}=setup(t),today=new Date(2026,9,12,23,59).getTime(),tomorrow=new Date(2026,9,13,9).getTime();
+  const task=store.create('跨天的任务',today);store.create('第二件',today);store.create('第三件',today);store.move(task.id,{x:90,y:80});
+  const result=store.defer(task.id,{note:'今天完成第一部分，下一步继续'},today);
+  assert.equal(result.task.done,false);assert.equal(result.task.completedAt,null);assert.equal(store.data.rewardCount,0);
+  assert.equal(result.task.deferredUntil,tomorrowKey(today));assert.equal(result.task.deferredUntil,'2026-10-13');
+  assert.ok(isDeferred(result.task,today));assert.equal(isDeferred(result.task,tomorrow),false);
+  const file=result.task.progressRecords[0].path,text=fs.readFileSync(file,'utf8');
+  assert.match(text,/今天完成了一部分，明天继续干/);assert.match(text,/下一步继续/);assert.match(text,/继续日期：2026-10-13/);assert.doesNotMatch(text,/完成状态：已完成/);assert.equal(path.dirname(file),store.recordsDir);
+  assert.equal(store.defer(task.id,{},today+10).alreadyDeferred,true);assert.equal(store.task(task.id).progressRecords.length,1);
+  assert.throws(()=>store.create('第四件',today),/三个/);
+  const restored=new Store(store.file,store.recordsDir);assert.ok(isDeferred(restored.task(task.id),today));assert.deepEqual(restored.task(task.id).position,{x:90,y:80});
+  assert.equal(restored.task(task.id).note,'今天完成第一部分，下一步继续');assert.equal(restored.create('明天新任务',tomorrow).slot,0);
+});
+test('可以当天恢复，再记进度或彻底完成，旧进度 TXT 保留',t=>{
+  const {isDeferred}=require('../store');const {store}=setup(t),now=new Date(2026,9,12,12).getTime(),task=store.create('继续努力',now);
+  const first=store.defer(task.id,{note:'第一阶段'},now).task.progressRecords[0].path;store.resume(task.id);assert.equal(isDeferred(store.task(task.id),now),false);
+  const second=store.defer(task.id,{note:'第二阶段'},now).task.progressRecords[1].path;assert.notEqual(first,second);
+  const complete=store.complete(task.id,{note:'终于完成'},now+1000).task;
+  assert.equal(complete.done,true);assert.equal(complete.deferredUntil,null);assert.equal(complete.progressRecords.length,2);
+  assert.match(fs.readFileSync(first,'utf8'),/第一阶段/);assert.match(fs.readFileSync(second,'utf8'),/第二阶段/);assert.match(fs.readFileSync(complete.recordPath,'utf8'),/完成状态：已完成/);
+  assert.throws(()=>store.defer(task.id,{note:'不能改动'},now),/已经完成/);assert.equal(store.task(task.id).note,'终于完成');
+});
+test('进度 TXT 写入失败不让伙伴休息，最新文字仍保留',t=>{
+  const {store,dir}=setup(t),task=store.create('不能丢失进度');const blocked=path.join(dir,'blocked-progress');fs.writeFileSync(blocked,'不是目录');store.recordsDir=blocked;
+  assert.throws(()=>store.defer(task.id,{note:'这段文字要保留'}));assert.equal(store.task(task.id).done,false);assert.equal(store.task(task.id).deferredUntil,null);assert.equal(store.task(task.id).progressRecords.length,0);assert.equal(store.task(task.id).note,'这段文字要保留');
+});

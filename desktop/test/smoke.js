@@ -112,6 +112,33 @@ async function invoke(page,method,value) {
     assert.equal(restoredBounds.width,640);assert.equal(restoredBounds.height,680);
     assert.equal(await nextTaskEditor.locator('#note').evaluate(e=>Math.round(e.getBoundingClientRect().height)),280);
     const windows=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length);assert.equal(windows,3);
+    await nextTaskEditor.locator('#note').fill('刚刚完成了第一步，明天继续第二步');
+    const restingPet=await pageFor('pet',snapshot.tasks[1].id),rested=restingPet.waitForEvent('close');
+    await nextTaskEditor.evaluate(()=>document.fonts.ready);await nextTaskEditor.screenshot({path:path.join(root,'partial-editor.png')});
+    await nextTaskEditor.locator('#defer').click();await rested;
+    snapshot=await invoke(manager,'state');const partialTask=snapshot.tasks[1];assert.equal(partialTask.done,false);assert.ok(partialTask.deferredUntil>snapshot.today);assert.equal(partialTask.progressRecords.length,1);
+    assert.match(fs.readFileSync(partialTask.progressRecords[0].path,'utf8'),/刚刚完成了第一步/);
+    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),2);
+    await application.close();application=null;manager=await launch();snapshot=await invoke(manager,'state');
+    assert.equal(snapshot.tasks[1].deferredUntil,partialTask.deferredUntil);assert.equal(snapshot.tasks[1].done,false);
+    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),2);
+    await invoke(manager,'editor',{id:partialTask.id});const resumeEditor=await pageFor('editor',partialTask.id);
+    assert.equal(await resumeEditor.locator('#note').inputValue(),'刚刚完成了第一步，明天继续第二步');assert.match(await resumeEditor.locator('#defer').textContent(),/今天继续干/);
+    await resumeEditor.locator('#defer').click();const returnedPet=await pageFor('pet',partialTask.id);await returnedPet.waitForFunction(()=>window.petReady);
+    assert.equal((await invoke(manager,'state')).tasks[1].deferredUntil,null);
+    // 仅在隔离的测试进程里快进日期，验证跨日不会恢复旧伙伴。
+    const restingAgain=returnedPet.waitForEvent('close');await resumeEditor.locator('#defer').click();await restingAgain;
+    const tomorrow=(await invoke(manager,'state')).tasks[1].deferredUntil;
+    await application.evaluate(({},date)=>{const next=new Date(date+'T09:00:00').getTime();Date.now=()=>next;},tomorrow);
+    await manager.waitForFunction(date=>document.querySelector('#count').textContent.startsWith(date),tomorrow,{timeout:20000});
+    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),0);
+    assert.equal((await invoke(manager,'state')).tasks.length,3);
+    await invoke(manager,'resume',{id:partialTask.id});
+    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),0);
+    const fresh=await invoke(manager,'create',{text:'今天重新出发，继续第二步'});const freshPet=await pageFor('pet',fresh.id);await freshPet.waitForFunction(()=>window.petReady);
+    assert.equal(fresh.slot,0);assert.equal(fresh.day,tomorrow);
+    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),1);
+    assert.equal((await invoke(manager,'state')).tasks[1].done,false);
     await manager.screenshot({path:path.join(root,'manager.png')});
     assert.deepEqual(errors,[]);console.log('Desktop smoke OK: creation, transparent pets, editor, latest notes, native TXT, reward/fade, daily limit, reopen, tray persistence, restart.');console.log('Test artifacts: '+root);
   }finally{if(application)await application.close();}

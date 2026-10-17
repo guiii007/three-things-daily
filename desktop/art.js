@@ -29,15 +29,22 @@ const palettes=[{main:'#ee7d87',shade:'#ce5d79',shine:'#ffc2b7'},{main:'#eec669'
     [[11,23],[12,24],[13,25],[14,26],[15,26],[16,27],[17,27],[18,27],[19,27],[20,26],[21,26],[22,25],[23,24],[24,23]].forEach(([x,y])=>dot(x,y,ink));
   }
 
-function drawCapsuleSVG(svg, index) {
-  const source=document.createElement('canvas');source.width=40;source.height=24;drawCapsule(source,index);
-  const pixels=source.getContext('2d').getImageData(0,0,40,24).data;
-  const fragment=document.createDocumentFragment();
-  for(let y=0;y<24;y++)for(let x=0;x<40;x++){
-    const offset=(y*40+x)*4;if(!pixels[offset+3])continue;
+function drawCompanion(canvas,task,companions) {
+  const pack=companions.find(p=>p.id===task.skin);
+  if(!pack||pack.id==='capsule'){canvas.width=40;canvas.height=24;drawCapsule(canvas,task.slot);return;}
+  canvas.width=pack.width;canvas.height=pack.height;
+  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
+  pack.frames.idle.forEach((row,y)=>[...row].forEach((key,x)=>{if(key==='.')return;const color=pack.palette[key];ctx.fillStyle=color.startsWith('$')?palettes[task.slot][color==='$primary'?'main':color.slice(1)]:color;ctx.fillRect(x,y,1,1);}));
+}
+function drawCompanionSVG(svg,task,companions) {
+  const source=document.createElement('canvas');source.width=40;source.height=24;drawCompanion(source,task,companions);
+  const width=source.width,height=source.height;svg.setAttribute('viewBox','0 0 '+width+' '+height);
+  const pixels=source.getContext('2d').getImageData(0,0,width,height).data,fragment=document.createDocumentFragment();
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+    const offset=(y*width+x)*4;if(!pixels[offset+3])continue;
     const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
     for(const [name,value] of Object.entries({x,y,width:1,height:1,fill:'rgb('+pixels[offset]+','+pixels[offset+1]+','+pixels[offset+2]+')'}))rect.setAttribute(name,value);
     fragment.append(rect);
   }
-  svg.replaceChildren(fragment);return pixels;
+  svg.replaceChildren(fragment);return {pixels,width,height};
 }

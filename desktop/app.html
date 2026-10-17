@@ -10,13 +10,19 @@
 </head>
 <body>
   <main id="manager" hidden>
-    <header><div class="eyebrow">每天，专心做好三件事</div><h1>三件事 · 像素伙伴</h1><p id="count"></p></header>
+    <header><div class="eyebrow">每天，专心做好三件事</div><h1>三件事 · 像素伙伴 <small id="app-version"></small></h1><p id="count"></p></header>
     <form id="create-form"><input id="new-task" maxlength="120" placeholder="今天想完成的一件事…" aria-label="新任务" required><button id="create" type="submit">召唤伙伴 ＋</button></form>
-    <div class="toolbar"><button id="records">打开 TXT 文件夹</button><button id="quit">退出软件</button><div class="size-control"><label for="pet-size-number">伙伴大小 <input id="pet-size-number" type="number" min="20" max="200" step="1" value="100" inputmode="numeric" aria-label="伙伴大小百分比">%</label><div class="size-slider"><span>20%</span><input id="pet-size" type="range" min="20" max="200" step="1" value="100" aria-label="伙伴大小"><span>200%</span><button id="reset-size" type="button">恢复 100%</button></div></div></div>
+    <div class="toolbar"><button id="open-library">伙伴广场</button><button id="records">打开 TXT 文件夹</button><button id="quit">退出软件</button><div class="size-control"><label for="pet-size-number">伙伴大小 <input id="pet-size-number" type="number" min="20" max="200" step="1" value="100" inputmode="numeric" aria-label="伙伴大小百分比">%</label><div class="size-slider"><span>20%</span><input id="pet-size" type="range" min="20" max="200" step="1" value="100" aria-label="伙伴大小"><span>200%</span><button id="reset-size" type="button">恢复 100%</button></div></div></div>
     <p class="hint">轻点伙伴写心得 · 按住半秒捏起拖动 · 松手放下<br>关闭此窗口后，伙伴仍在桌面；右下角托盘可重新打开。</p>
     <section id="today-list" aria-label="今天的任务"></section>
     <details id="history"><summary>过去的任务与记录</summary><section id="history-list"></section></details>
     <p id="folder" class="hint"></p>
+  </main>
+  <main id="library" hidden>
+    <header><div class="eyebrow">挑一个喜欢的伙伴，一起做好今天的事</div><h1>伙伴广场</h1><p class="hint">选择后会用于今天未完成的任务和之后创建的伙伴。不会额外创建任务。</p></header>
+    <section id="companion-list" class="companion-grid" aria-label="我的伙伴"></section>
+    <p id="companion-warnings" class="hint"></p>
+    <section class="creator-panel"><h2>让你的 AI 创造伙伴</h2><p>导出创作包，交给电脑上的 AI agent；它可以按规范制作、校验和预览，再把伙伴文件导入这里。</p><div class="toolbar"><button id="export-kit">导出 AI 创作包</button><button id="import-companion">导入伙伴</button></div><label>复制这句话给你的 AI<textarea id="agent-prompt" rows="3" readonly>请阅读我导出的“三件事-伙伴创作包”中的 AGENTS.md 和 SPEC.md，为我创建喜欢的像素伙伴。请先了解我想要的外观，制作一个新的 .companion.json，运行校验并生成预览，再告诉我如何导入伙伴广场。</textarea></label><p class="hint">伙伴保存在本机，可用 JSON 文件分享。当前是本地伙伴库，无需账号。</p></section>
   </main>
   <main id="editor" hidden>
     <div class="editor-head"><canvas id="editor-art" width="40" height="24"></canvas><span id="status"></span></div>
@@ -24,7 +30,7 @@
     <p id="time" class="hint"></p>
     <label>心得 / 灵感 / 想记录的话<textarea id="note" rows="4" maxlength="20000" placeholder="想到什么，就在这里写下来…" aria-label="心得与想法"></textarea></label>
     <p id="save-status" class="hint">写下的内容会自动保存</p>
-    <button id="complete" class="primary">这件事完成啦 √</button>
+    <div class="editor-actions"><button id="complete" class="primary">这件事完成啦 √</button><button id="defer">今天完成了一部分，明天继续干</button></div>
   </main>
   <button id="pet" hidden aria-label="轻点写心得，按住半秒捏起拖动"><svg class="pet-art" viewBox="0 0 40 24" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true"></svg></button>
   <main id="reward" hidden><canvas width="36" height="36" aria-label="暖心的像素笑脸"></canvas><p id="reward-copy"></p></main>
