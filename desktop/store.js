@@ -29,7 +29,7 @@ class Store {
   constructor(file, recordsDir) {
     this.file = file;
     this.recordsDir = recordsDir;
-    this.data = { version: 1, tasks: [], rewardCount: 0, petSize: 100, selectedSkin: 'capsule', editorLayout: { ...defaultEditorLayout } };
+    this.data = { version: 1, tasks: [], rewardCount: 0, petSize: 100, selectedSkin: 'capsule', companionPosition: null, editorLayout: { ...defaultEditorLayout } };
     if (fs.existsSync(file)) {
       const data = JSON.parse(fs.readFileSync(file, 'utf8'));
       if (data.version !== 1 || !Array.isArray(data.tasks) || !Number.isInteger(data.rewardCount) || data.rewardCount < 0 || data.tasks.some(t => !t || !/^[0-9a-f-]{36}$/.test(t.id) || !/^\d{4}-\d{2}-\d{2}$/.test(t.day) || ![0,1,2].includes(t.slot) || typeof t.text !== 'string' || !t.text.trim() || t.text.length > 120 || typeof t.note !== 'string' || t.note.length > 20000 || typeof t.done !== 'boolean' || !Number.isFinite(t.createdAt) || (t.done && !Number.isFinite(t.completedAt)) || (t.position !== null && (!t.position || !Number.isFinite(t.position.x) || !Number.isFinite(t.position.y))))) throw new Error('数据文件格式不正确，请保留文件以便恢复。');
@@ -44,6 +44,8 @@ class Store {
         if ((task.deferredUntil !== null && !/^\d{4}-\d{2}-\d{2}$/.test(task.deferredUntil)) || !Array.isArray(task.progressRecords) || task.progressRecords.some(r => !r || !Number.isFinite(r.at) || typeof r.path !== 'string')) throw new Error('任务进度数据无效，请保留文件以便恢复。');
       }
       if(data.selectedSkin===undefined)data.selectedSkin='capsule';
+      if(data.companionPosition===undefined)data.companionPosition=data.tasks.findLast(t=>t.position)?.position||null;
+      if(data.companionPosition!==null&&(!data.companionPosition||!Number.isFinite(data.companionPosition.x)||!Number.isFinite(data.companionPosition.y)))throw new Error('伙伴位置设置无效。');
       if(typeof data.selectedSkin!=='string'||!/^[a-z0-9][a-z0-9-]{1,47}$/.test(data.selectedSkin))throw new Error('伙伴形象设置无效。');
       this.data = data;
     }
@@ -81,7 +83,7 @@ class Store {
     text = String(text).trim();
     if (!text || text.length > 120) throw new Error('请填写 1 到 120 字的任务。');
     const next = this.snapshot(), date = dayKey(now), count = next.tasks.filter(t => t.day === date).length;
-    if (count >= 3) throw new Error('今天已经创建三个伙伴啦，明天再来。');
+    if (count >= 3) throw new Error('今天已经创建三件事啦，明天再来。');
     const task = { id: randomUUID(), day: date, slot: count, skin: this.data.selectedSkin, text, note: '', done: false, createdAt: now, completedAt: null, position: null, recordPath: null, deferredUntil: null, progressRecords: [] };
     next.tasks.push(task); this.commit(next); return task;
   }
@@ -100,6 +102,10 @@ class Store {
   move(id, position) {
     if (!position || !Number.isFinite(position.x) || !Number.isFinite(position.y)) throw new Error('位置无效。');
     const next = this.snapshot(); this.task(id, next).position = { x: Math.round(position.x), y: Math.round(position.y) }; this.commit(next);
+  }
+  moveCompanion(position) {
+    if(!position||!Number.isFinite(position.x)||!Number.isFinite(position.y))throw new Error('位置无效。');
+    const next=this.snapshot();next.companionPosition={x:Math.round(position.x),y:Math.round(position.y)};this.commit(next);
   }
   complete(id, patch, now = Date.now()) {
     this.update(id, patch);

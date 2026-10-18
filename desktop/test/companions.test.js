@@ -29,10 +29,16 @@ test('选择形象更新今天未完成任务及新任务，不改历史和已�
   assert.equal(store.task(past.id).skin,'capsule');assert.equal(store.task(first.id).skin,'capsule');assert.equal(store.task(second.id).skin,'chick');assert.equal(store.create('新的伙伴',now).skin,'chick');assert.equal(new Store(store.file,store.recordsDir).data.selectedSkin,'chick');
 });
 
-test('像素伙伴主题色映射正确，身体不是轮廓棕色',()=>{
+test('小鸡没有环带，胶囊和自定义主题色不会随事情序号改变',()=>{
   const vm=require('node:vm'),context={};vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(__dirname,'../art.js'),'utf8'),context);
-  for(const [slot,expected] of [[0,'#ee7d87'],[1,'#eec669'],[2,'#8bc99c']]){
-    const fills=new Map(),ctx={fillStyle:'#000000',clearRect(){},fillRect(x,y){fills.set(x+','+y,this.fillStyle);}};
-    context.drawCompanion({getContext:()=>ctx},{skin:'chick',slot},[example]);assert.equal(fills.get('48,70'),expected);assert.equal(fills.get('48,56'),'#8bc8c0');
+  const render=(skin,slot,companions=[example])=>{
+    const fills=[],ctx={fillStyle:'#000000',clearRect(){},save(){},restore(){},translate(){},fillRect(x,y,w,h){fills.push([x,y,w,h,this.fillStyle]);}};
+    context.drawCompanion({getContext:()=>ctx},{skin,slot},companions);return fills;
+  };
+  assert.ok(!example.frames.idle.some(row=>/[RT]/.test(row)));
+  for(const skin of ['chick','capsule'])for(const slot of [1,2])assert.deepEqual(render(skin,slot),render(skin,0));
+  const themed={...example,palette:{...example.palette,B:'$primary'}};
+  for(const slot of [0,1,2]){
+    const pixels=render('chick',slot,[themed]);assert.equal(pixels.find(p=>p[0]===48&&p[1]===56)[4],'#eec669');
   }
 });

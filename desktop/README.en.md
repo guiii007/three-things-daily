@@ -1,16 +1,16 @@
-# Three Things · Pixel Companions (Windows trial v0.3.1)
+# Three Things · Pixel Companions (Windows trial v0.4.0)
 
 [简体中文](README.md) | **English**
 
 ## Usage
 
-Quit the old version using the manager or system tray, then [download Windows v0.3.1](https://github.com/guiii007/three-things-daily/releases/download/v0.3.1/ThreeThings-0.3.1-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
+Quit the old version using the manager or system tray, then [download Windows v0.4.0](https://github.com/guiii007/three-things-daily/releases/download/v0.4.0/ThreeThings-0.4.0-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
 
-1. Enter a task and click “召唤伙伴” (Summon companion). Up to three pixel capsules are created each day, in red, yellow, and green order.
+1. Enter a task and click “添加事情” (Add task). Up to three daily tasks share one desktop companion.
 2. Close the manager to keep your companions above other apps.
-3. Tap a capsule to edit the task and write notes. Text is saved automatically.
+3. Tap the companion and switch between “这件事”, “这桩事”, and “这档事” in one editor. Only created tasks have buttons. Each task keeps independent notes, saved before switching.
 4. Hold a capsule for about half a second to see the pickup animation, then drag while holding the mouse button. Release to save its position. A long press does not open the editor; double-clicking is not required.
-5. Click “这件事完成啦 √” (Task complete) to save a TXT record. The companion disappears, and a pixel smile with colorful encouragement appears and gently fades away.
+5. Click “这件事完成啦 √” (Task complete) to save a TXT record. A pixel smile with colorful encouragement appears and gently fades away. The companion stays while any task is active, and leaves when all tasks are complete or resting.
 6. Double-click the capsule icon in the system tray to reopen the manager. Right-click to hide companions or quit.
 7. Use the size slider or number field to set 20%–200%. Changes apply immediately, stay in sync, and are saved. Use “恢复 100%” (Reset to 100%) to restore the default. Blank, fractional, or out-of-range inputs are not applied; leaving the field restores the last valid value.
 
@@ -57,8 +57,10 @@ The offline font is Fusion Pixel 12px Proportional SC, licensed under the SIL Op
 
 ## Companion Plaza and AI creation
 
-Click “伙伴广场” in the manager to select a capsule, a detailed mint-green chick, or an imported companion. The chick’s belly band changes between red, yellow, and green. Selection applies to today’s unfinished tasks and future tasks without creating extra tasks.
+Click “伙伴广场” in the manager to select a capsule, a detailed mint-green chick, or an imported companion. The chick stays mint green without a belly band, and the capsule uses a fixed warm-yellow design. Selection applies to today’s unfinished tasks and future tasks without creating extra tasks.
 
 Click “导出 AI 创作包” to export a self-contained kit with AGENTS.md, SPEC.md, a template, and Node.js validation and preview tools. Give the folder to your own agent, then use “导入伙伴” to import the resulting .companion.json file and select it. No app source, API key, or marketplace account is required. Custom files are stored in `%APPDATA%/three-things-companion/companions`.
 
 The chick tray menu includes optional launch at login, off by default. The manager and tray show the current version. Quit the old app before upgrading; closing its manager only hides the window.
+
+Version 0.4.0 uses one desktop companion for all daily tasks. Task buttons appear as tasks are created. Switching preserves independent notes, completion states, and TXT records. The shared companion position, size, and editor dimensions persist across restarts.

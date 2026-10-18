@@ -26,6 +26,11 @@ header { border-bottom:2px solid #eadfd4; margin-bottom:20px; }
 details { margin-top:24px; } summary { cursor:pointer; }
 .empty { border:2px dashed #dfd3c6; padding:28px; text-align:center; color:#897a88; }
 .editor-head { display:flex; gap:12px; align-items:center; font:12px var(--font); margin-bottom:16px; }
+#task-tabs { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:4px; }
+#task-tabs button { font:12px/1.5 var(--font); padding:6px 12px; }
+#task-tabs button[aria-pressed="true"] { background:#65506f; color:#fff8df; border-color:#65506f; }
+#task-tabs button[data-status="done"]::after { content:' √'; }
+#task-tabs button[data-status="deferred"]::after { content:' ·'; }
 label { display:block; font:12px/1.5 var(--font); }
 textarea { display:block; margin-top:8px; width:100%; resize:vertical; padding:8px; font:24px/1.5 var(--font); font-synthesis:none; }
 #note { min-height:150px; }

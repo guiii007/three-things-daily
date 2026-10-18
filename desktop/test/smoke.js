@@ -18,8 +18,8 @@ async function launch() {
 }
 async function pageFor(view,id) {
   for(let n=0;n<100;n++) {
-    const page=application.windows().find(p=>{const u=new URL(p.url());return u.searchParams.get('view')===view&&(!id||u.searchParams.get('id')===id);});
-    if(page){await page.waitForSelector(`#${view}:not([hidden])`);return page;}
+    const page=application.windows().find(p=>{const u=new URL(p.url());return u.searchParams.get('view')===view&&(view==='pet'||view==='editor'||!id||u.searchParams.get('id')===id);});
+    if(page){await page.waitForSelector(`#${view}:not([hidden])`);if(view==='editor'&&id)await page.waitForFunction(taskId=>id===taskId,id);return page;}
     await new Promise(r=>setTimeout(r,50));
   }throw new Error('未找到窗口 '+view);
 }
@@ -111,23 +111,23 @@ async function invoke(page,method,value) {
     const restoredBounds=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('view=editor')).getNormalBounds());
     assert.equal(restoredBounds.width,640);assert.equal(restoredBounds.height,680);
     assert.equal(await nextTaskEditor.locator('#note').evaluate(e=>Math.round(e.getBoundingClientRect().height)),280);
-    const windows=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length);assert.equal(windows,3);
+    const windows=await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length);assert.equal(windows,1);
     await nextTaskEditor.locator('#note').fill('刚刚完成了第一步，明天继续第二步');
-    const restingPet=await pageFor('pet',snapshot.tasks[1].id),rested=restingPet.waitForEvent('close');
+    const restingPet=await pageFor('pet');
     await nextTaskEditor.evaluate(()=>document.fonts.ready);await nextTaskEditor.screenshot({path:path.join(root,'partial-editor.png')});
-    await nextTaskEditor.locator('#defer').click();await rested;
+    await nextTaskEditor.locator('#defer').click();await manager.waitForFunction(async()=>(await window.companion.call('state')).value.tasks[1].progressRecords.length===1);
     snapshot=await invoke(manager,'state');const partialTask=snapshot.tasks[1];assert.equal(partialTask.done,false);assert.ok(partialTask.deferredUntil>snapshot.today);assert.equal(partialTask.progressRecords.length,1);
     assert.match(fs.readFileSync(partialTask.progressRecords[0].path,'utf8'),/刚刚完成了第一步/);
-    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),2);
+    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),1);
     await application.close();application=null;manager=await launch();snapshot=await invoke(manager,'state');
     assert.equal(snapshot.tasks[1].deferredUntil,partialTask.deferredUntil);assert.equal(snapshot.tasks[1].done,false);
-    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),2);
+    assert.equal(await application.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().filter(w=>w.webContents.getURL().includes('view=pet')).length),1);
     await invoke(manager,'editor',{id:partialTask.id});const resumeEditor=await pageFor('editor',partialTask.id);
     assert.equal(await resumeEditor.locator('#note').inputValue(),'刚刚完成了第一步，明天继续第二步');assert.match(await resumeEditor.locator('#defer').textContent(),/今天继续干/);
     await resumeEditor.locator('#defer').click();const returnedPet=await pageFor('pet',partialTask.id);await returnedPet.waitForFunction(()=>window.petReady);
     assert.equal((await invoke(manager,'state')).tasks[1].deferredUntil,null);
     // 仅在隔离的测试进程里快进日期，验证跨日不会恢复旧伙伴。
-    const restingAgain=returnedPet.waitForEvent('close');await resumeEditor.locator('#defer').click();await restingAgain;
+    await resumeEditor.locator('#defer').click();await manager.waitForFunction(async()=>(await window.companion.call('state')).value.tasks[1].progressRecords.length===2);
     const tomorrow=(await invoke(manager,'state')).tasks[1].deferredUntil;
     await application.evaluate(({},date)=>{const next=new Date(date+'T09:00:00').getTime();Date.now=()=>next;},tomorrow);
     await manager.waitForFunction(date=>document.querySelector('#count').textContent.startsWith(date),tomorrow,{timeout:20000});

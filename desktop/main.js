@@ -41,11 +41,11 @@ function clamp(bounds) {
   const area = screen.getDisplayMatching(bounds).workArea;
   return { x: Math.round(Math.max(area.x, Math.min(area.x + area.width - bounds.width, bounds.x))), y: Math.round(Math.max(area.y, Math.min(area.y + area.height - bounds.height, bounds.y))) };
 }
-function taskDimensions(task,percent=store.data.petSize){const pack=companionLibrary.get(task.skin);return petWindowDimensions(percent,pack?.width||40,pack?.height||24);}
+function taskDimensions(task,percent=store.data.petSize){const pack=companionLibrary.get(store.data.selectedSkin);return petWindowDimensions(percent,pack?.width||40,pack?.height||24);}
 function petPosition(task) {
   const area = screen.getPrimaryDisplay().workArea;
   const dimensions = taskDimensions(task);
-  return clamp({ ...(task.position || { x: area.x + area.width - dimensions.width - 40 - task.slot * (dimensions.width + 30), y: area.y + area.height - dimensions.height - 43 }), ...dimensions });
+  return clamp({ ...(store.data.companionPosition || { x: area.x + area.width - dimensions.width - 40, y: area.y + area.height - dimensions.height - 43 }), ...dimensions });
 }
 function applyPetShape(id, win) {
   if (!nativeUITest && petShapes.has(id)) {const shape=petShapes.get(id);win.setShape(scaledShape(shape.rects,store.data.petSize,shape.width,shape.height));}
@@ -61,13 +61,13 @@ function resizePets(percent) {
     if (!nativeUITest) { win.setShape([]); win.setBounds({ ...position, ...dimensions }); }
     else win.setPosition(position.x, position.y);
     applyPetShape(id, win);
-    if (position.x !== old.x || position.y !== old.y) store.move(id, position);
+    if (position.x !== old.x || position.y !== old.y) store.moveCompanion(position);
   }
   broadcast();
 }
 function belongsToToday(task) { return task.day === dayKey(); }
 function addPet(task) {
-  if (pets.has(task.id) || !belongsToToday(task) || task.done || isDeferred(task) || closingPets.has(task.id)) return;
+  if (pets.has(task.id) || !belongsToToday(task) || closingPets.has(task.id)) return;
   const win = createWindow({ ...petPosition(task), width: nativeUITest ? 320 : taskDimensions(task).width, height: nativeUITest ? 240 : taskDimensions(task).height, frame: nativeUITest, transparent: !nativeUITest, backgroundColor: nativeUITest ? '#fffaf0' : '#00000000', resizable: false, movable: false, focusable: nativeUITest, skipTaskbar: !nativeUITest, hasShadow: false, alwaysOnTop: true }, { view: 'pet', id: task.id });
   // 隔离的原生输入测试让自动化工具能枚举小窗口，正式角色仍无焦点、无任务栏条目。
   if(nativeUITest){win.on('page-title-updated',event=>event.preventDefault());win.setTitle('长按测试角色');}
@@ -77,8 +77,11 @@ function addPet(task) {
   win.on('closed', () => { if (pets.get(task.id) === win) pets.delete(task.id); const gesture=gestures.get(task.id);if(gesture)clearInterval(gesture.timer);gestures.delete(task.id);petShapes.delete(task.id); });
 }
 function syncPets() {
-  for (const task of store.data.tasks) if (belongsToToday(task) && !task.done && !isDeferred(task)) addPet(task);
-  for (const [id, win] of pets) if ((!belongsToToday(store.task(id)) || store.task(id).done || isDeferred(store.task(id))) && !closingPets.has(id)) win.close();
+  const today=store.data.tasks.filter(belongsToToday);
+  // 第一个任务仅作为稳定的窗口标识；伙伴由当天所有待办共享。
+  const anchor=today.some(t=>!t.done&&!isDeferred(t))?today[0]:null;
+  for (const [id,win] of pets) if(id!==anchor?.id&&!closingPets.has(id)){finishGesture(id,true);win.close();}
+  if(anchor)addPet(anchor);
 }
 function finishGesture(id, cancelled=false) {
   const gesture=gestures.get(id), win=pets.get(id); if(!gesture)return;
@@ -86,13 +89,13 @@ function finishGesture(id, cancelled=false) {
   if(!win||win.isDestroyed())return;
   win.setMovable(false);
   if(gesture.picked) {
-    try{store.move(id,win.getBounds());broadcast();}catch(error){dialog.showErrorBox('位置暂时未能保存',error.message);}
+    try{store.moveCompanion(win.getBounds());broadcast();}catch(error){dialog.showErrorBox('位置暂时未能保存',error.message);}
     win.webContents.send('companion:gesture',{phase:'released'});
     setTimeout(()=>{if(!nativeUITest&&!win.isDestroyed()&&!gestures.has(id))applyPetShape(id, win);},240);
   }else{
     if(!nativeUITest)applyPetShape(id, win);
     win.webContents.send('companion:gesture',{phase:'idle'});
-    if(!cancelled&&!gesture.moved)showEditor(id);
+    if(!cancelled&&!gesture.moved){const task=store.data.tasks.find(t=>belongsToToday(t)&&!t.done&&!isDeferred(t));if(task)showEditor(task.id);}
   }
 }
 function sampleGesture(id) {
@@ -107,8 +110,10 @@ function sampleGesture(id) {
 }
 function showEditor(id) {
   const task = store.task(id);
-  if (editors.has(id)) { const win = editors.get(id); win.show(); win.focus(); return; }
-  const pet = pets.get(id), origin = pet ? pet.getBounds() : { ...petPosition(task), ...taskDimensions(task) };
+  for(const [initialId,win] of editors)if(store.task(initialId).day===task.day&&!win.isDestroyed()){
+    win.webContents.send('companion:select-task',id);win.show();win.focus();return;
+  }
+  const pet = [...pets.values()][0], origin = pet ? pet.getBounds() : { ...petPosition(task), ...taskDimensions(task) };
   const area = screen.getDisplayMatching(origin).workArea;
   const width = Math.min(area.width, Math.max(400, store.data.editorLayout.width));
   const height = Math.min(area.height, Math.max(430, store.data.editorLayout.height));
@@ -164,7 +169,13 @@ ipcMain.handle('companion:call', async (event, method, value) => {
   try {
     const context = senderContext(event), id = value?.id;
     const requireManager = () => { if (context.view !== 'manager') throw new Error('此操作需要在管理窗口进行。'); };
-    const requireTask = () => { if (context.view !== 'manager' && context.id !== id) throw new Error('任务来源无效。'); };
+    const requireTask = () => {
+      if(context.view==='manager')return;
+      if(context.view==='editor'&&store.task(context.id).day===store.task(id).day)return;
+      if(context.view==='pet'&&id===context.id)return;
+      if(context.view==='pet'&&method==='editor'&&belongsToToday(store.task(id)))return;
+      throw new Error('任务来源无效。');
+    };
     let result;
     switch (method) {
       case 'library': requireManager(); showLibrary(); break;
@@ -200,21 +211,21 @@ ipcMain.handle('companion:call', async (event, method, value) => {
       case 'complete': {
         requireTask(); const done = store.complete(id, value.patch); result = done.task;
         if (!done.alreadyDone) {
-          const pet = pets.get(id), position = pet?.getBounds() || petPosition(done.task);
-          closingPets.add(id); if (pet) pet.webContents.send('companion:exit');
-          if (editors.has(id)) editors.get(id).close();
+          const [petId,pet]=[...pets.entries()][0]||[], position = pet?.getBounds() || petPosition(done.task);
+          const resting=!store.data.tasks.some(t=>belongsToToday(t)&&!t.done&&!isDeferred(t));
+          if(resting&&pet){finishGesture(petId,true);closingPets.add(petId);pet.webContents.send('companion:exit');}
           broadcast();
-          setTimeout(() => { if (pet && !pet.isDestroyed()) pet.close(); closingPets.delete(id); syncPets(); showReward({ position, phraseIndex: done.phraseIndex, all: store.data.tasks.filter(t => t.day === done.task.day).length === 3 && store.data.tasks.filter(t => t.day === done.task.day).every(t => t.done) }); }, 650);
+          setTimeout(() => { if (resting&&pet&&!pet.isDestroyed()) pet.close(); closingPets.delete(petId); syncPets(); showReward({ position, phraseIndex: done.phraseIndex, all: store.data.tasks.filter(t => t.day === done.task.day).length === 3 && store.data.tasks.filter(t => t.day === done.task.day).every(t => t.done) }); }, 650);
         } break;
       }
       case 'defer': {
         requireTask(); const deferred = store.defer(id, value.patch); result = deferred.task;
         if (!deferred.alreadyDeferred) {
-          const pet = pets.get(id); finishGesture(id, true); closingPets.add(id);
-          if (pet) pet.webContents.send('companion:exit');
-          if (editors.has(id)) editors.get(id).close();
+          const [petId,pet]=[...pets.entries()][0]||[];
+          const resting=!store.data.tasks.some(t=>belongsToToday(t)&&!t.done&&!isDeferred(t));
+          if(resting&&pet){finishGesture(petId,true);closingPets.add(petId);pet.webContents.send('companion:exit');}
           broadcast();
-          setTimeout(() => { if (pet && !pet.isDestroyed()) pet.close(); closingPets.delete(id); syncPets(); }, 650);
+          setTimeout(() => { if (resting&&pet&&!pet.isDestroyed()) pet.close(); closingPets.delete(petId); syncPets(); }, 650);
         } break;
       }
       case 'resume': requireTask(); result = store.resume(id); syncPets(); broadcast(); break;
@@ -262,7 +273,7 @@ else {
       tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'assets', 'app-icon.png')).resize({width:32,height:32}));
       tray.setToolTip('三件事 · 像素伙伴'); tray.on('double-click', showManager); trayMenu(); syncPets(); showManager();
       let date = dayKey(); setInterval(() => { const next = dayKey(); if (date !== next) { date = next; syncPets(); broadcast(); } }, 15000).unref();
-      screen.on('display-removed', () => { for (const [id, win] of pets) { const pos = clamp(win.getBounds()); win.setPosition(pos.x,pos.y); store.move(id,pos); } });
+      screen.on('display-removed', () => { for (const win of pets.values()) { const pos = clamp(win.getBounds()); win.setPosition(pos.x,pos.y); store.moveCompanion(pos); } });
     } catch (error) { dialog.showErrorBox('三件事暂时无法启动', error.message + '\n已有记录不会被覆盖。'); app.quit(); }
   });
 }

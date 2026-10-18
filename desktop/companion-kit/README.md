@@ -11,7 +11,7 @@
 1. 确定角色外观，按 `SPEC.md` 编辑像素网格。
 2. 创建模板：`node cli.js init my-pet.companion.json --id my-pet --name 我的伙伴`。
 3. 校验：`node cli.js validate my-pet.companion.json`。
-4. 生成预览：`node cli.js preview my-pet.companion.json`，用浏览器打开生成的 HTML。预览会显示三种任务配色。
+4. 生成预览：`node cli.js preview my-pet.companion.json`，用浏览器打开生成的 HTML。预览显示软件中的固定配色；一个伙伴陪伴当天的全部事情。
 5. 在软件的“伙伴广场”里选择“导入伙伴”，打开 JSON 文件，再点“使用这个伙伴”。
 
 最终只需要交付 `.companion.json` 文件。没有 Node.js 时，agent 也可以直接按规范生成 JSON，再由软件导入时校验。请保留唯一 id，避免与已有伙伴重名。

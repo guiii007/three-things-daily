@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { parsePack } = require('./companion-kit/format');
-const capsule = { id: 'capsule', name: '像素胶囊', description: '最初的红黄绿胶囊伙伴，举着小手为你加油。', builtin: true };
+const capsule = { id: 'capsule', name: '像素胶囊', description: '暖黄色胶囊伙伴，举着小手，陪你做好每天三件事。', builtin: true };
 class CompanionLibrary {
   constructor(dir) { this.dir = dir; this.reload(); }
   reload() {

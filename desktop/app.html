@@ -11,7 +11,7 @@
 <body>
   <main id="manager" hidden>
     <header><div class="eyebrow">每天，专心做好三件事</div><h1>三件事 · 像素伙伴 <small id="app-version"></small></h1><p id="count"></p></header>
-    <form id="create-form"><input id="new-task" maxlength="120" placeholder="今天想完成的一件事…" aria-label="新任务" required><button id="create" type="submit">召唤伙伴 ＋</button></form>
+    <form id="create-form"><input id="new-task" maxlength="120" placeholder="今天想完成的一件事…" aria-label="新任务" required><button id="create" type="submit">添加事情 ＋</button></form>
     <div class="toolbar"><button id="open-library">伙伴广场</button><button id="records">打开 TXT 文件夹</button><button id="quit">退出软件</button><div class="size-control"><label for="pet-size-number">伙伴大小 <input id="pet-size-number" type="number" min="20" max="200" step="1" value="100" inputmode="numeric" aria-label="伙伴大小百分比">%</label><div class="size-slider"><span>20%</span><input id="pet-size" type="range" min="20" max="200" step="1" value="100" aria-label="伙伴大小"><span>200%</span><button id="reset-size" type="button">恢复 100%</button></div></div></div>
     <p class="hint">轻点伙伴写心得 · 按住半秒捏起拖动 · 松手放下<br>关闭此窗口后，伙伴仍在桌面；右下角托盘可重新打开。</p>
     <section id="today-list" aria-label="今天的任务"></section>
@@ -26,7 +26,8 @@
   </main>
   <main id="editor" hidden>
     <div class="editor-head"><canvas id="editor-art" width="40" height="24"></canvas><span id="status"></span></div>
-    <label>这件事<textarea id="title" rows="2" maxlength="120" aria-label="任务内容"></textarea></label>
+    <nav id="task-tabs" aria-label="切换事情"></nav>
+    <textarea id="title" rows="2" maxlength="120" aria-label="任务内容"></textarea>
     <p id="time" class="hint"></p>
     <label>心得 / 灵感 / 想记录的话<textarea id="note" rows="4" maxlength="20000" placeholder="想到什么，就在这里写下来…" aria-label="心得与想法"></textarea></label>
     <p id="save-status" class="hint">写下的内容会自动保存</p>

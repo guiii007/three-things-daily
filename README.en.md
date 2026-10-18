@@ -2,9 +2,18 @@
 
 [简体中文](README.md) | **English**
 
-Focus on three things each day, with cute pixel capsules keeping you company on your desktop. Tap a companion to write down your thoughts. Finish a task to see a warm smile and automatically save a plain-text TXT record.
+Focus on three things each day, with one cute pixel companion keeping you company on your desktop. Tap a companion to write down your thoughts. Finish a task to see a warm smile and automatically save a plain-text TXT record.
 
-[Download Windows v0.3.1](https://github.com/guiii007/three-things-daily/releases/download/v0.3.1/ThreeThings-0.3.1-Windows.exe) · [Browse releases](https://github.com/guiii007/three-things-daily/releases) · [Open the web app](https://guiii007.github.io/three-things-daily/)
+[Download Windows v0.4.0](https://github.com/guiii007/three-things-daily/releases/download/v0.4.0/ThreeThings-0.4.0-Windows.exe) · [Browse releases](https://github.com/guiii007/three-things-daily/releases) · [Open the web app](https://guiii007.github.io/three-things-daily/)
+
+## One companion for all three things
+
+The editor shows “这件事” for your first task, adds “这桩事” for the second, and “这档事” for the third. Switch tasks in the same window. Each task keeps its own text, notes, and TXT records; switching saves your latest input first. There is at most one desktop companion.
+
+![One mint-green chick and three task buttons in a shared editor](docs/screenshots/06-single-companion-tabs.png)
+
+<details>
+<summary>Earlier five-step demo (previous three-companion interface)</summary>
 
 ## See how it works in five screenshots
 
@@ -38,33 +47,36 @@ Every completed task generates a plain-text TXT file with its content, timestamp
 
 ![All three tasks are complete, with red boxes and arrows highlighting automatically saved desktop TXT files](docs/screenshots/05-desktop-txt-records.png)
 
-[Download the Windows app and start your three things today](https://github.com/guiii007/three-things-daily/releases/download/v0.3.1/ThreeThings-0.3.1-Windows.exe)
+[Download the Windows app and start your three things today](https://github.com/guiii007/three-things-daily/releases/download/v0.4.0/ThreeThings-0.4.0-Windows.exe)
+
+
+</details>
 
 ## Desktop features
 
-- **Companion Plaza:** Switch between the pixel capsule and a detailed 96×96 pixel chick. Its body stays mint green, with a red, yellow, or green curved band wrapped around its belly for each task.
+- **Companion Plaza:** Switch between the pixel capsule and a detailed 96×96 pixel chick. The chick stays mint green without a belly band. The capsule uses a fixed warm-yellow design.
 - **Create with your own AI:** Export a kit with instructions, a template, validation, and preview tools for your agent, then import its companion JSON file.
 - **Optional launch at login:** Enable or disable it from the chick tray icon’s context menu. It is off by default.
-- **Daily progress:** Save partial progress as a TXT record and let your companion rest for today. Create the next day’s tasks manually.
-- **Three things a day:** Create up to three companions each day: red, yellow, then green pixel capsules. Completing a task does not free up a daily slot. The limit resets the next day.
+- **Daily progress:** Save partial progress as a TXT record and let that task rest for today while continuing other tasks. Create the next day’s tasks manually.
+- **Three things a day:** Manually create up to three tasks each day and share one desktop companion. Completing a task does not free up a daily slot. The limit resets the next day.
 - **Desktop company:** Companions stay above other apps. Closing the manager keeps them on your desktop; use the system tray to reopen the manager or hide your companions.
 - **Free placement:** Tap a character to open its task and notes. Hold for about half a second to pick it up, drag it, and release to save its position.
 - **Adjustable size:** Set 20%–200% using the slider or number field. Both controls stay in sync, changes are saved automatically, and you can reset to 100%. Characters use SVG pixel blocks, with matching click areas as they resize.
 - **Remembered editor size:** The last task-window width and height and text-field heights are saved. They are restored after closing, reopening, or restarting, and shared by newly opened task editors.
 - **Text notes:** Edit tasks and capture thoughts or ideas, with automatic saving.
-- **Completion feedback:** The companion disappears with an animation, followed by a pixel smile and colorful encouragement that gently fade away.
+- **Completion feedback:** Every completion brings a pixel smile and colorful encouragement that gently fade away. The companion stays while tasks remain active, and leaves with an animation when all tasks are complete or resting.
 - **Desktop TXT records:** Completing a task automatically saves its text, timestamps, and notes to a TXT file on your Windows desktop. Completed tasks can be exported again.
 - **Task history:** Keep previous tasks and notes. Past tasks stay in history. Create today’s companions manually; unfinished tasks from previous days do not reappear automatically.
 
 ## Getting started
 
 1. Download the Windows EXE and double-click to run it. No Node.js installation is required.
-2. Enter a task and click “召唤伙伴” (Summon companion).
+2. Enter a task and click “添加事情” (Add task).
 3. Tap your companion to write notes, or hold for about half a second to pick it up and drag it. Release to put it down.
 4. Drag the “伙伴大小” (Companion size) slider or enter an integer from 20 to 200 to adjust your desktop companions.
 5. Click “这件事完成啦 √” (Task complete) when you finish. Its TXT record is saved directly to your Windows desktop.
 
-Before upgrading, choose Quit in the manager or system tray, then launch the new version. Closing the manager alone does not quit the app; opening a new version while an old one is running may bring back the old window. The manager and tray menu show the current version; v0.3.1 includes the Companion Plaza button. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese; this document provides an English guide.
+Before upgrading, choose Quit in the manager or system tray, then launch the new version. Closing the manager alone does not quit the app; opening a new version while an old one is running may bring back the old window. The manager and tray menu show the current version; v0.4.0 includes the Companion Plaza button. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese; this document provides an English guide.
 
 ## Data and records
 

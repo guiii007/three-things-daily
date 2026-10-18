@@ -13,7 +13,7 @@ test('每天最多三个，完成后不释放名额，第二天重新计算', t 
   const { store }=setup(t), today=new Date(2026,9,11,10).getTime(), tomorrow=new Date(2026,9,12,10).getTime();
   const task=store.create('第一件',today);store.create('第二件',today);store.create('第三件',today);
   store.complete(task.id,{note:'做完啦'},today+1000);
-  assert.throws(()=>store.create('第四件',today),/三个/);
+  assert.throws(()=>store.create('第四件',today),/三件事/);
   assert.equal(store.create('新的一天',tomorrow).slot,0);
   assert.equal(store.data.tasks.length,4);
 });
@@ -96,7 +96,7 @@ test('部分完成保存今日进度，保留未完成状态、心得和每日�
   const file=result.task.progressRecords[0].path,text=fs.readFileSync(file,'utf8');
   assert.match(text,/今天完成了一部分，明天继续干/);assert.match(text,/下一步继续/);assert.match(text,/继续日期：2026-10-13/);assert.doesNotMatch(text,/完成状态：已完成/);assert.equal(path.dirname(file),store.recordsDir);
   assert.equal(store.defer(task.id,{},today+10).alreadyDeferred,true);assert.equal(store.task(task.id).progressRecords.length,1);
-  assert.throws(()=>store.create('第四件',today),/三个/);
+  assert.throws(()=>store.create('第四件',today),/三件事/);
   const restored=new Store(store.file,store.recordsDir);assert.ok(isDeferred(restored.task(task.id),today));assert.deepEqual(restored.task(task.id).position,{x:90,y:80});
   assert.equal(restored.task(task.id).note,'今天完成第一部分，下一步继续');assert.equal(restored.create('明天新任务',tomorrow).slot,0);
 });
@@ -112,4 +112,8 @@ test('可以当天恢复，再记进度或彻底完成，旧进度 TXT 保留',t
 test('进度 TXT 写入失败不让伙伴休息，最新文字仍保留',t=>{
   const {store,dir}=setup(t),task=store.create('不能丢失进度');const blocked=path.join(dir,'blocked-progress');fs.writeFileSync(blocked,'不是目录');store.recordsDir=blocked;
   assert.throws(()=>store.defer(task.id,{note:'这段文字要保留'}));assert.equal(store.task(task.id).done,false);assert.equal(store.task(task.id).deferredUntil,null);assert.equal(store.task(task.id).progressRecords.length,0);assert.equal(store.task(task.id).note,'这段文字要保留');
+});
+
+test('旧任务位置迁移到共享伙伴，位置跨任务与重启保留',t=>{
+ const {store}=setup(t);const a=store.create('已有事情');store.move(a.id,{x:123,y:456});const old=store.snapshot();delete old.companionPosition;fs.writeFileSync(store.file,JSON.stringify(old));const migrated=new Store(store.file,store.recordsDir);assert.deepEqual(migrated.data.companionPosition,{x:123,y:456});migrated.moveCompanion({x:222.4,y:333.6});migrated.create('新增事情');assert.deepEqual(new Store(store.file,store.recordsDir).data.companionPosition,{x:222,y:334});assert.throws(()=>migrated.moveCompanion({x:NaN,y:1}),/位置/);
 });

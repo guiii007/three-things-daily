@@ -1,7 +1,7 @@
-const palettes=[{main:'#ee7d87',shade:'#ce5d79',shine:'#ffc2b7'},{main:'#eec669',shade:'#cca249',shine:'#ffe7ae'},{main:'#8bc99c',shade:'#65a585',shine:'#c8e9b8'}];
+const companionPalette={main:'#eec669',shade:'#cca249',shine:'#ffe7ae'};
   function drawCapsule(canvas,index){
     const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,40,24);ctx.save();ctx.translate(4,0);
-    const p=palettes[index],ink='#604555',cream='#fff0d0',dot=(x,y,c,w=1,h=1)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
+    const p=companionPalette,ink='#604555',cream='#fff0d0',dot=(x,y,c,w=1,h=1)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
     const spans=[[8,23],[6,25],[4,27],[3,28],[2,29],[2,29],[2,29],[2,29],[2,29],[2,29],[3,28],[4,27],[6,25],[8,23]];
     spans.forEach(([l,r],row)=>{for(let x=l;x<=r;x++){const prev=spans[row-1],next=spans[row+1];const edge=x===l||x===r||!prev||!next||x<prev[0]||x>prev[1]||x<next[0]||x>next[1];dot(x,row+3,edge?ink:(x<15?(row>9?p.shade:p.main):cream));}});
     dot(7,5,p.shine,5);dot(5,6,p.shine,3);dot(4,7,p.shine);dot(14,5,p.shade,1,10);
@@ -34,7 +34,7 @@ function drawCompanion(canvas,task,companions) {
   if(!pack||pack.id==='capsule'){canvas.width=40;canvas.height=24;drawCapsule(canvas,task.slot);return;}
   canvas.width=pack.width;canvas.height=pack.height;
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
-  pack.frames.idle.forEach((row,y)=>[...row].forEach((key,x)=>{if(key==='.')return;const color=pack.palette[key];ctx.fillStyle=color.startsWith('$')?palettes[task.slot][color==='$primary'?'main':color.slice(1)]:color;ctx.fillRect(x,y,1,1);}));
+  pack.frames.idle.forEach((row,y)=>[...row].forEach((key,x)=>{if(key==='.')return;const color=pack.palette[key];ctx.fillStyle=color.startsWith('$')?companionPalette[color==='$primary'?'main':color.slice(1)]:color;ctx.fillRect(x,y,1,1);}));
 }
 function drawCompanionSVG(svg,task,companions) {
   const source=document.createElement('canvas');source.width=40;source.height=24;drawCompanion(source,task,companions);

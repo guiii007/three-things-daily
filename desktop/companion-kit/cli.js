@@ -4,13 +4,13 @@ const path = require('node:path');
 const { parsePack, validatePack } = require('./format');
 function preview(pack) {
   const escape = text => text.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const themes = [{primary:'#ee7d87',shade:'#ce5d79',shine:'#ffc2b7'},{primary:'#eec669',shade:'#cca249',shine:'#ffe7ae'},{primary:'#8bc99c',shade:'#65a585',shine:'#c8e9b8'}];
+  const themes = [{primary:'#eec669',shade:'#cca249',shine:'#ffe7ae'}];
   const cards = themes.map(theme => {
     let rects = '';
     pack.frames.idle.forEach((row,y)=>[...row].forEach((key,x)=>{if(key==='.')return;const color=pack.palette[key],fill=color.startsWith('$')?theme[color.slice(1)]:color;rects+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${fill}"/>`;}));
     return `<div><svg viewBox="0 0 ${pack.width} ${pack.height}" shape-rendering="crispEdges">${rects}</svg></div>`;
   }).join('');
-  return `<!doctype html><meta charset="utf-8"><title>${escape(pack.name)} — 伙伴预览</title><style>body{margin:40px;background:#fffaf0;color:#604555;font-family:system-ui}section{display:flex;flex-wrap:wrap;gap:20px}section div{border:2px solid #c9b8aa;background:repeating-conic-gradient(#eee 0% 25%,#fff 0% 50%) 0/16px 16px;width:240px}svg{display:block;width:100%}p{max-width:760px;line-height:1.7}</style><h1>${escape(pack.name)}</h1><p>${escape(pack.description)}</p><section>${cards}</section><p>透明区域为棋盘格。三种主题对应每天的第一个、第二个、第三个任务。软件会提供捏起、拖动、消失动画。</p>`;
+  return `<!doctype html><meta charset="utf-8"><title>${escape(pack.name)} — 伙伴预览</title><style>body{margin:40px;background:#fffaf0;color:#604555;font-family:system-ui}section{display:flex;flex-wrap:wrap;gap:20px}section div{border:2px solid #c9b8aa;background:repeating-conic-gradient(#eee 0% 25%,#fff 0% 50%) 0/16px 16px;width:240px}svg{display:block;width:100%}p{max-width:760px;line-height:1.7}</style><h1>${escape(pack.name)}</h1><p>${escape(pack.description)}</p><section>${cards}</section><p>透明区域为棋盘格。同一个伙伴陪伴当天的全部事情，配色不随事情序号变化。软件会提供捏起、拖动、消失动画。</p>`;
 }
 function run(args) {
   const [command,file,...rest] = args;
