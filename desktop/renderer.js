@@ -160,6 +160,7 @@ async function init() {
   window.companion.onState(next=>{state=next;if(view==='manager')renderManager();if(view==='editor')renderEditor();if(view==='pet'){renderPetSize();renderPetCharacter().catch(error);}if(view==='library')renderLibrary();});
   if(view==='manager') {
     renderManager();
+    if(state.startupWarning)$('#message').textContent=state.startupWarning;
     $('#pet-size').addEventListener('input',safely(()=>{const percent=Number($('#pet-size').value);syncSizeControls(percent,true);return changePetSize(percent);}));
     $('#pet-size-number').addEventListener('input',safely(()=>{const percent=validSizeNumber();if(percent!==null)return changePetSize(percent);}));
     $('#pet-size-number').addEventListener('blur',()=>{if(validSizeNumber()===null){$('#message').textContent='伙伴大小请输入 20～200 之间的整数，已恢复上次设置。';syncSizeControls(sizePending??state.petSize,true);}});

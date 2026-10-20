@@ -10,7 +10,7 @@ const fs = require('node:fs');
 const testRoot = process.env.CAPSULE_TEST_ROOT;
 const nativeUITest = Boolean(testRoot && process.env.CAPSULE_NATIVE_UI_TEST === '1');
 if (testRoot) app.setPath('userData', path.join(testRoot, 'data'));
-let startup, companionLibrary, libraryWindow;
+let startup, companionLibrary, libraryWindow, startupWarning='';
 let store, manager, tray, quitting = false, petsVisible = true, rewardWindow;
 const pets = new Map(), editors = new Map(), gestures = new Map(), petShapes = new Map(), closingPets = new Set(), rewardQueue = [];
 const pagePath = path.join(__dirname, 'app.html');
@@ -20,7 +20,7 @@ function createWindow(options, query) {
   win.webContents.on('will-navigate', event => event.preventDefault());
   win.loadFile(pagePath, { query }); return win;
 }
-function state() { return { ...store.snapshot(), today: dayKey(), appVersion: app.getVersion(), recordsDir: store.recordsDir, companions: companionLibrary.packs, companionWarnings: companionLibrary.warnings, petsVisible }; }
+function state() { return { ...store.snapshot(), today: dayKey(), appVersion: app.getVersion(), recordsDir: store.recordsDir, companions: companionLibrary.packs, companionWarnings: companionLibrary.warnings, startupWarning, petsVisible }; }
 function broadcast() {
   for (const win of BrowserWindow.getAllWindows()) if (!win.isDestroyed()) win.webContents.send('companion:state', state());
 }
@@ -266,6 +266,7 @@ else {
     try {
       app.setAppUserModelId('io.threethings.companion');
       startup = createLoginStartup(app, { testFile: testRoot ? path.join(testRoot, 'login-item.json') : undefined });
+      try{startup.reconcile();}catch(error){startupWarning='开机启动路径暂未更新：'+error.message+' 请在托盘中重新勾选开机自启动。';}
       const recordsDir = testRoot ? path.join(testRoot, 'records') : app.getPath('desktop');
       companionLibrary = new CompanionLibrary(path.join(app.getPath('userData'),'companions'));
       store = new Store(path.join(app.getPath('userData'), 'tasks.json'), recordsDir);

@@ -1,10 +1,10 @@
-# Three Things · Pixel Companions (Windows trial v0.4.1)
+# Three Things · Pixel Companions (Windows trial v0.4.2)
 
 [简体中文](README.md) | **English**
 
 ## Usage
 
-Quit the old version using the manager or system tray, then [download Windows v0.4.1](https://github.com/guiii007/three-things-daily/releases/download/v0.4.1/ThreeThings-0.4.1-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
+Quit the old version using the manager or system tray, then [download Windows v0.4.2](https://github.com/guiii007/three-things-daily/releases/download/v0.4.2/ThreeThings-0.4.2-Windows.exe) and double-click to run it. No Node.js installation is required. Existing tasks, notes, and size settings are retained. The app interface currently uses Chinese.
 
 1. Enter a task and click “添加事情” (Add task). Up to three daily tasks share one desktop companion.
 2. Close the manager to keep your companions above other apps.
@@ -66,3 +66,5 @@ The chick tray menu includes optional launch at login, off by default. The manag
 Version 0.4.0 uses one desktop companion for all daily tasks. Task buttons appear as tasks are created. Switching preserves independent notes, completion states, and TXT records. The shared companion position, size, and editor dimensions persist across restarts.
 
 Version 0.4.1 renders the built-in chick directly from the same high-resolution transparent artwork as the desktop icon. It preserves the mint-green body and original facial proportions with smooth scaling. Capsules and imported pixel companions keep their existing renderer.
+
+Version 0.4.2 migrates an enabled startup entry from an older executable to the current packaged app. It only handles this app’s current-user entry, preserves disabled settings, skips isolated tests, and keeps the portable EXE path stable. Migration failures are shown in the manager without blocking task access.

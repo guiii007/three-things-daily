@@ -4,7 +4,7 @@
 
 Focus on three things each day, with one cute pixel companion keeping you company on your desktop. Tap a companion to write down your thoughts. Finish a task to see a warm smile and automatically save a plain-text TXT record.
 
-[Download Windows v0.4.1](https://github.com/guiii007/three-things-daily/releases/download/v0.4.1/ThreeThings-0.4.1-Windows.exe) · [Browse releases](https://github.com/guiii007/three-things-daily/releases) · [Open the web app](https://guiii007.github.io/three-things-daily/)
+[Download Windows v0.4.2](https://github.com/guiii007/three-things-daily/releases/download/v0.4.2/ThreeThings-0.4.2-Windows.exe) · [Browse releases](https://github.com/guiii007/three-things-daily/releases) · [Open the web app](https://guiii007.github.io/three-things-daily/)
 
 ## One companion for all three things
 
@@ -47,7 +47,7 @@ Every completed task generates a plain-text TXT file with its content, timestamp
 
 ![All three tasks are complete, with red boxes and arrows highlighting automatically saved desktop TXT files](docs/screenshots/05-desktop-txt-records.png)
 
-[Download the Windows app and start your three things today](https://github.com/guiii007/three-things-daily/releases/download/v0.4.1/ThreeThings-0.4.1-Windows.exe)
+[Download the Windows app and start your three things today](https://github.com/guiii007/three-things-daily/releases/download/v0.4.2/ThreeThings-0.4.2-Windows.exe)
 
 
 </details>

@@ -1,6 +1,6 @@
 {
   "name": "three-things-companion",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "三件事 · 像素伙伴桌面软件",
   "main": "desktop/main.js",
   "author": "three-things-daily",
@@ -13,7 +13,8 @@
     "prepare:assets": "node desktop/prepare-assets.js",
     "build": "node desktop/prepare-assets.js && electron-builder --win portable --x64 --config.electronDist=node_modules/electron/dist",
     "test:library": "node desktop/test/library.js",
-    "test:single": "node desktop/test/single-companion.js"
+    "test:single": "node desktop/test/single-companion.js",
+    "test:autostart": "node desktop/test/autostart.js"
   },
   "devDependencies": {
     "@fontsource/fusion-pixel-12px-proportional-sc": "5.2.5",

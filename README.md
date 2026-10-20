@@ -4,7 +4,7 @@
 
 每天专心做好三件事，让一个可爱的像素伙伴在桌面上陪你一起完成。轻点伙伴记录心得，完成任务后收获暖心笑脸，并自动生成纯文字 TXT。
 
-[下载 Windows v0.4.1](https://github.com/guiii007/three-things-daily/releases/download/v0.4.1/ThreeThings-0.4.1-Windows.exe) · [查看发布版本](https://github.com/guiii007/three-things-daily/releases) · [网页版在线使用](https://guiii007.github.io/three-things-daily/)
+[下载 Windows v0.4.2](https://github.com/guiii007/three-things-daily/releases/download/v0.4.2/ThreeThings-0.4.2-Windows.exe) · [查看发布版本](https://github.com/guiii007/three-things-daily/releases) · [网页版在线使用](https://guiii007.github.io/three-things-daily/)
 
 ## 一个伙伴，陪你做好三件事
 
@@ -47,7 +47,7 @@
 
 ![三件任务均已完成，红框和箭头标出桌面自动保存的 TXT 文件](docs/screenshots/05-desktop-txt-records.png)
 
-[下载 Windows 版，开始今天的三件事](https://github.com/guiii007/three-things-daily/releases/download/v0.4.1/ThreeThings-0.4.1-Windows.exe)
+[下载 Windows 版，开始今天的三件事](https://github.com/guiii007/three-things-daily/releases/download/v0.4.2/ThreeThings-0.4.2-Windows.exe)
 
 
 </details>
