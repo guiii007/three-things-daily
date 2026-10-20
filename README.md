@@ -4,7 +4,7 @@
 
 每天专心做好三件事，让一个可爱的像素伙伴在桌面上陪你一起完成。轻点伙伴记录心得，完成任务后收获暖心笑脸，并自动生成纯文字 TXT。
 
-[下载 Windows v0.4.0](https://github.com/guiii007/three-things-daily/releases/download/v0.4.0/ThreeThings-0.4.0-Windows.exe) · [查看发布版本](https://github.com/guiii007/three-things-daily/releases) · [网页版在线使用](https://guiii007.github.io/three-things-daily/)
+[下载 Windows v0.4.1](https://github.com/guiii007/three-things-daily/releases/download/v0.4.1/ThreeThings-0.4.1-Windows.exe) · [查看发布版本](https://github.com/guiii007/three-things-daily/releases) · [网页版在线使用](https://guiii007.github.io/three-things-daily/)
 
 ## 一个伙伴，陪你做好三件事
 
@@ -47,14 +47,14 @@
 
 ![三件任务均已完成，红框和箭头标出桌面自动保存的 TXT 文件](docs/screenshots/05-desktop-txt-records.png)
 
-[下载 Windows 版，开始今天的三件事](https://github.com/guiii007/three-things-daily/releases/download/v0.4.0/ThreeThings-0.4.0-Windows.exe)
+[下载 Windows 版，开始今天的三件事](https://github.com/guiii007/three-things-daily/releases/download/v0.4.1/ThreeThings-0.4.1-Windows.exe)
 
 
 </details>
 
 ## 桌面版功能
 
-- **伙伴广场**：在像素胶囊和 96×96 像素小鸡之间切换；小鸡保留原本的青绿色身体并去掉环带，胶囊固定为暖黄色。
+- **伙伴广场**：在像素胶囊和 高清原画小鸡之间切换；小鸡保留原本的青绿色身体并去掉环带，胶囊固定为暖黄色。
 - **用自己的 AI 创作**：导出包含说明、模板、校验和预览工具的 AI 创作包，交给自己的 agent 制作，再导入伙伴 JSON 使用。
 - **可选开机自启动**：在小鸡托盘图标的右键菜单中勾选或取消，默认关闭。
 - **今日进度**：“今天完成了一部分，明天继续干”会保存进度 TXT，这件事今天休息；其余事情仍可继续，第二天仍由你手动创建任务。

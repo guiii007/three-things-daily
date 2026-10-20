@@ -10,11 +10,13 @@ const example = require('../companion-kit/example.companion.json');
 function setup(t) { const root=path.resolve('.desktop-test');fs.mkdirSync(root,{recursive:true});const dir=fs.mkdtempSync(path.join(root,'library-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return dir; }
 test('伙伴文件拒绝无效网格、代码颜色、路径 id、空角色和超大文件',()=>{
   assert.equal(validatePack(example).id,'chick');
+  const imported=validatePack({...example,renderStyle:'original',image:'https://invalid/image.png'});assert.equal(imported.renderStyle,undefined);assert.equal(imported.image,undefined);
   for(const change of [{id:'../../escape'},{width:129},{name:''},{palette:{O:'url(https://invalid)'}},{frames:{idle:Array(24).fill('.'.repeat(40))}},{frames:{idle:['A']}}])assert.throws(()=>validatePack({...example,...change}));
   assert.throws(()=>parsePack(' '.repeat(65537)),/64 KB/);
 });
 test('内置伙伴、导入持久化与重复 id 保护',t=>{
   const dir=setup(t),library=new CompanionLibrary(path.join(dir,'companions'));assert.deepEqual(library.packs.map(p=>p.id),['capsule','chick']);
+  assert.equal(library.get('chick').renderStyle,'original');assert.equal(library.get('chick').name,'原画小鸡');assert.equal(library.get('chick').frames,undefined);
   const file=path.join(dir,'custom.json');fs.writeFileSync(file,JSON.stringify({...example,id:'my-bird',name:'我的小鸟'}));library.import(file);
   assert.equal(new CompanionLibrary(library.dir).get('my-bird').name,'我的小鸟');assert.throws(()=>library.import(file),/相同 id/);
   fs.writeFileSync(file,JSON.stringify(example));assert.throws(()=>library.import(file),/相同 id/);

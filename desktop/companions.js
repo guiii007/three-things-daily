@@ -5,7 +5,7 @@ const capsule = { id: 'capsule', name: '像素胶囊', description: '暖黄色�
 class CompanionLibrary {
   constructor(dir) { this.dir = dir; this.reload(); }
   reload() {
-    this.packs = [capsule, { ...parsePack(fs.readFileSync(path.join(__dirname,'companion-kit','example.companion.json'),'utf8')), builtin: true }];
+    this.packs = [capsule, { id:'chick', name:'原画小鸡', description:'与桌面图标相同的高清透明小鸡，保留青绿色圆肚子、棕色发梢和自然的表情。', width:128, height:128, renderStyle:'original', builtin:true }];
     this.warnings = [];
     if (!fs.existsSync(this.dir)) return;
     for (const file of fs.readdirSync(this.dir).filter(name => name.endsWith('.json')).sort()) {

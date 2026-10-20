@@ -74,5 +74,6 @@ body.pet #message,body.reward #message { display:none; }
 #agent-prompt{font:13px/1.7 'Microsoft YaHei',sans-serif;min-height:110px;background:#fffdf7}
 
 .task-row canvas,#editor-art,.companion-card canvas{object-fit:contain}
+canvas[data-render-style="original"]{image-rendering:auto}
 
 #app-version{font:12px/1.5 'Microsoft YaHei',sans-serif;color:#897a88;white-space:nowrap}

@@ -120,8 +120,8 @@ let drawnPetSkin;
 async function renderPetCharacter(){
   const task={skin:state.selectedSkin,slot:0},key=(state.companions.find(p=>p.id===task.skin)||state.companions[0]).id;
   if(drawnPetSkin===key)return;
-  const {pixels,width,height}=drawCompanionSVG($('#pet svg'),task,state.companions),rects=[];
-  for(let y=0;y<height;y++){let x=0;while(x<width){while(x<width&&!pixels[(y*width+x)*4+3])x++;const l=x;while(x<width&&pixels[(y*width+x)*4+3])x++;if(l<x)rects.push({x:l,y,width:x-l,height:1});}}
+  const {pixels,width,height,alphaThreshold=1}=drawCompanionSVG($('#pet svg'),task,state.companions),rects=[];
+  for(let y=0;y<height;y++){let x=0;while(x<width){while(x<width&&pixels[(y*width+x)*4+3]<alphaThreshold)x++;const l=x;while(x<width&&pixels[(y*width+x)*4+3]>=alphaThreshold)x++;if(l<x)rects.push({x:l,y,width:x-l,height:1});}}
   await call('shape',{rects,width,height});drawnPetSkin=key;window.petReady=true;
 }
 function renderLibrary(){
@@ -156,7 +156,7 @@ async function initPet() {
   window.companion.onExit(()=>{clearTimeout(landingTimer);pet.classList.remove('picked','landing');pet.classList.add('departing');});
 }
 async function init() {
-  document.body.className=view; $(`#${view}`).hidden=false; state=await call('state');
+  document.body.className=view; $(`#${view}`).hidden=false;await loadCompanionArt();state=await call('state');
   window.companion.onState(next=>{state=next;if(view==='manager')renderManager();if(view==='editor')renderEditor();if(view==='pet'){renderPetSize();renderPetCharacter().catch(error);}if(view==='library')renderLibrary();});
   if(view==='manager') {
     renderManager();

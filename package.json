@@ -1,6 +1,6 @@
 {
   "name": "three-things-companion",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "三件事 · 像素伙伴桌面软件",
   "main": "desktop/main.js",
   "author": "three-things-daily",

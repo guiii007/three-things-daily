@@ -1,4 +1,8 @@
 const companionPalette={main:'#eec669',shade:'#cca249',shine:'#ffe7ae'};
+let chickArtwork;
+async function loadCompanionArt() {
+  const image=new Image();image.src='assets/app-icon.png';await image.decode();chickArtwork=image;
+}
   function drawCapsule(canvas,index){
     const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,40,24);ctx.save();ctx.translate(4,0);
     const p=companionPalette,ink='#604555',cream='#fff0d0',dot=(x,y,c,w=1,h=1)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
@@ -31,12 +35,28 @@ const companionPalette={main:'#eec669',shade:'#cca249',shine:'#ffe7ae'};
 
 function drawCompanion(canvas,task,companions) {
   const pack=companions.find(p=>p.id===task.skin);
+  if(canvas.dataset)canvas.dataset.renderStyle=pack?.renderStyle==='original'?'original':'pixel';
+  if(pack?.id==='chick'&&pack.renderStyle==='original'){
+    canvas.width=512;canvas.height=512;
+    const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.clearRect(0,0,512,512);ctx.drawImage(chickArtwork,0,0,512,512);return;
+  }
   if(!pack||pack.id==='capsule'){canvas.width=40;canvas.height=24;drawCapsule(canvas,task.slot);return;}
   canvas.width=pack.width;canvas.height=pack.height;
   const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
   pack.frames.idle.forEach((row,y)=>[...row].forEach((key,x)=>{if(key==='.')return;const color=pack.palette[key];ctx.fillStyle=color.startsWith('$')?companionPalette[color==='$primary'?'main':color.slice(1)]:color;ctx.fillRect(x,y,1,1);}));
 }
 function drawCompanionSVG(svg,task,companions) {
+  const pack=companions.find(p=>p.id===task.skin);
+  if(pack?.id==='chick'&&pack.renderStyle==='original'){
+    // 外观直接显示高清透明原画，128×128 采样仅用于 Windows 鼠标轮廓。
+    const source=document.createElement('canvas');source.width=128;source.height=128;
+    const ctx=source.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(chickArtwork,0,0,128,128);
+    const image=document.createElementNS('http://www.w3.org/2000/svg','image');
+    image.setAttribute('href',chickArtwork.src);image.setAttribute('width','128');image.setAttribute('height','128');
+    svg.setAttribute('viewBox','0 0 128 128');svg.setAttribute('shape-rendering','auto');svg.replaceChildren(image);
+    return {pixels:ctx.getImageData(0,0,128,128).data,width:128,height:128,alphaThreshold:96};
+  }
+  svg.setAttribute('shape-rendering','crispEdges');
   const source=document.createElement('canvas');source.width=40;source.height=24;drawCompanion(source,task,companions);
   const width=source.width,height=source.height;svg.setAttribute('viewBox','0 0 '+width+' '+height);
   const pixels=source.getContext('2d').getImageData(0,0,width,height).data,fragment=document.createDocumentFragment();
